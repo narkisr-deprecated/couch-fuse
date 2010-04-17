@@ -1,13 +1,20 @@
 (ns com.narkisr.fake-fs
-  (:gen-class))
+  (:gen-class)
+  (:import fuse.FuseMount org.apache.commons.logging.LogFactory))
 
 (gen-class
   :name com.narkisr.fake
   :implements [fuse.Filesystem3]
   :prefix "filesystem-")
 
+
+
 (defn -main []
-  (println "hey"))
+  (FuseMount/mount
+    (into-array ["/home/ronen/CodeProjects/couch-fuse/fake" "-f"])
+    (new com.narkisr.fake)
+    (LogFactory/getLog (class com.narkisr.fake))))
+
 
 (comment
   public int getattr (String path, FuseGetattrSetter getattrSetter) throws FuseException ;
