@@ -2,11 +2,34 @@
   (:gen-class)
   (:import fuse.FuseMount org.apache.commons.logging.LogFactory))
 
+(defn- with-type [type x]
+  (with-meta x {:type type}))
+
+
+(defstruct node :name :mode :xattrs)
+(defstruct directory :node :files)
+(defstruct file :node :content)
+(defstruct link :node :link)
+
+(def root
+  (with-type :directory
+    (struct directory (struct node "/" 0755 [:description "Root directory"])
+      [(struct file (struct node "README" 0644 [:description "A Readme File" :mimetype "text/plain"]) (. "this is a nice readme contents" getBytes))])))
+
+
+
+(defn lookup [path]
+  (if (= path "/") root
+    (let [f (java.io.File. path) parent (lookup (. f getParent))]
+      (if ((type parent) :directory) (find (parent :files) (. f getName))))))
+
 (gen-class
   :name com.narkisr.fake
   :implements [fuse.Filesystem3]
-  :prefix "filesystem-")
+  :prefix "fs-")
 
+(defn fs-getdir [this path dirFiller]
+  (identity 0))
 
 
 (defn -main []
