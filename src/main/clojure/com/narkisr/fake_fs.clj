@@ -1,42 +1,44 @@
 (ns com.narkisr.fake-fs
-  (:gen-class)
-  (:import fuse.FuseMount org.apache.commons.logging.LogFactory))
-
-(defn- with-type [type x]
-  (with-meta x {:type type}))
+  (:use com.narkisr.mocking com.narkisr.fs-logic)
+  (:import fuse.FuseFtypeConstants fuse.Errno))
 
 
-(defstruct node :name :mode :xattrs)
-(defstruct directory :node :files)
-(defstruct file :node :content)
-(defstruct link :node :link)
-
-(def root
-  (with-type :directory
-    (struct directory (struct node "/" 0755 [:description "Root directory"])
-      [(struct file (struct node "README" 0644 [:description "A Readme File" :mimetype "text/plain"]) (. "this is a nice readme contents" getBytes))])))
-
-
-
-(defn lookup [path]
-  (if (= path "/") root
-    (let [f (java.io.File. path) parent (lookup (. f getParent))]
-      (if ((type parent) :directory) (find (parent :files) (. f getName))))))
+(defmacro defn-with-this [name args body]
+  `(defn ~name ~(into ['this] args) (~@body)))
 
 (gen-class
   :name com.narkisr.fake
   :implements [fuse.Filesystem3]
   :prefix "fs-")
 
-(defn fs-getdir [this path dirFiller]
-  (identity 0))
+(defn-with-this fs-getdir [path filler]
+  (let [node (lookup path) type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK}]
+    (if (directory? node)
+      (do (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
+        (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))
+        (identity 0))
+      (identity Errno/ENOENT))))
 
+(fs-getdir " la " "/" (mock fuse.FuseDirFiller))
 
-(defn -main []
-  (FuseMount/mount
-    (into-array ["/home/ronen/CodeProjects/couch-fuse/fake" "-f"])
-    (new com.narkisr.fake)
-    (LogFactory/getLog (class com.narkisr.fake))))
+(def NAME_LENGTH 1024)
+(def BLOCK_SIZE 512)
+
+(defn- apply-attr [setter node type length]
+  (let [time (/ (System/currentTimeMillis) 1000)]
+    (. setter set (. node hashCode)
+      (bit-or type (node :mode)) 1 0 0 0
+      length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) time time time)
+    (identity 0)))
+
+(defn-with-this fs-getattr [path setter]
+  (let [node (lookup path)]
+    (condp = (type node)
+      :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idioum
+      :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (-> node :content alength))
+      :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
+      Errno/ENOENT
+      )))
 
 
 (comment
