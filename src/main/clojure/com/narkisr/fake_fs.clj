@@ -3,23 +3,23 @@
   (:import fuse.FuseFtypeConstants fuse.Errno))
 
 
-(defmacro defn-with-this [name args body]
-  `(defn ~name ~(into ['this] args) (~@body)))
+(def errors {:fs-getdir Errno/ENOTDIR :fs-getattr Errno/ENOENT})
+
+(defmacro def-fs-fn [name args success body]
+  `(defn ~name ~(into ['this] args)
+    (if ~success (do ~body (identity 0)) (errors ~(clojure.lang.Keyword/intern name)))
+    ))
 
 (gen-class
   :name com.narkisr.fake
   :implements [fuse.Filesystem3]
   :prefix "fs-")
 
-(defn-with-this fs-getdir [path filler]
+(def-fs-fn fs-getdir [path filler] (directory? (lookup path))
   (let [node (lookup path) type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK}]
-    (if (directory? node)
-      (do (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
-        (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))
-        (identity 0))
-      (identity Errno/ENOENT))))
+    (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
+      (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))))
 
-(fs-getdir " la " "/" (mock fuse.FuseDirFiller))
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
@@ -28,25 +28,21 @@
   (let [time (/ (System/currentTimeMillis) 1000)]
     (. setter set (. node hashCode)
       (bit-or type (node :mode)) 1 0 0 0
-      length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) time time time)
-    (identity 0)))
+      length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) time time time)))
 
-(defn-with-this fs-getattr [path setter]
+(def-fs-fn fs-getattr [path setter] true
   (let [node (lookup path)]
     (condp = (type node)
       :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idioum
       :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (-> node :content alength))
       :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
-      Errno/ENOENT
       )))
 
+;(fs-getattr "this " "/" (mock fuse.FuseGetattrSetter ))
 
 (comment
-  public int getattr (String path, FuseGetattrSetter getattrSetter) throws FuseException ;
 
   public int readlink (String path, CharBuffer link) throws FuseException ;
-
-  public int getdir (String path, FuseDirFiller dirFiller) throws FuseException ;
 
   public int mknod (String path, int mode, int rdev) throws FuseException ;
 
