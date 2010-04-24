@@ -24,3 +24,14 @@
       (if (= (type parent) :directory) (get-in parent [:files (. f getName)])))))
 
 (defn directory? [node] (= (type node) :directory))
+
+(defn create-handle [metadata]
+  (let [type-data {:type :filehandle}]
+    (proxy [clojure.lang.IObj] []
+      (withMeta [meta] (merge type-data metadata))
+      (meta [] (merge type-data metadata))
+      (toString [] (str "handle for " (:node metadata)))
+      (finalize [] (println "finalizing")))))
+
+
+(type (create-handle {:node "bla"}))

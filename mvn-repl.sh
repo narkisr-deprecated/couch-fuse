@@ -27,4 +27,5 @@ CLASSPATH="$CLASSPATH:$M2_REPO/commons-logging/commons-logging/1.1.1/commons-log
 export CLASSPATH
 
 
-mvn clojure:repl -Djava.library.path=$LD_LIBRARY_PATH -o 
+fusermount -u fake
+mvn clojure:repl -Djava.library.path=$LD_LIBRARY_PATH -o  
