@@ -43,14 +43,14 @@
   (let [node (lookup path)]
     (. openSetter setFh (create-handle {:node node}))))
 
-(def-fs-fn fs-read [path fh buf offset] (= :filehandle (type fh))
+(def-fs-fn fs-read [path fh buf offset] (filehandle? fh)
   (let [file (-> fh meta :node)]
     (. buf put (file :content) offset (min (. buf remaining) (- (-> file :content alength) offset)))))
 
 
-(def-fs-fn fs-flush [path fh] (= :filehandle (type fh))
+(def-fs-fn fs-flush [path fh] (filehandle? fh)
   (identity 0)
   )
 
-(def-fs-fn fs-release [path fh flags] (= :filehandle (type fh))
+(def-fs-fn fs-release [path fh flags] (filehandle? fh)
   (System/runFinalization))

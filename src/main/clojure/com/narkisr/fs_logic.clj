@@ -24,6 +24,7 @@
       (if (= (type parent) :directory) (get-in parent [:files (. f getName)])))))
 
 (defn directory? [node] (= (type node) :directory))
+(defn filehandle? [node] (= (type node) :filehandle))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]
