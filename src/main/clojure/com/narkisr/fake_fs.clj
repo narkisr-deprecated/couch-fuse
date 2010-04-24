@@ -6,6 +6,13 @@
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
+
+
+(gen-class
+  :name com.narkisr.fake
+  :implements [fuse.Filesystem3]
+  :prefix "fs-")
+
 (def log (LogFactory/getLog (class com.narkisr.fake)))
 
 (defn log-access [name args]
@@ -18,12 +25,6 @@
   ([name args pre error body]
     `(defn ~name ~(into ['this] args)
       (if ~pre (do (log-access ~name ~args) ~body (identity 0)) ~error))))
-
-
-(gen-class
-  :name com.narkisr.fake
-  :implements [fuse.Filesystem3]
-  :prefix "fs-")
 
 (def-fs-fn fs-getdir [path filler] (directory? (lookup path)) Errno/ENOTDIR
   (let [node (lookup path) type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK}]
