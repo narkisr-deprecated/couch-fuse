@@ -1,30 +1,13 @@
 (ns com.narkisr.fake-fs
-  (:use com.narkisr.mocking com.narkisr.fs-logic)
-  (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
+  (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs)
+  (:import fuse.FuseFtypeConstants fuse.Errno ))
 
 ; see @ http://omake.metaprl.org/prerelease/omake-dll-fuse.html
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
 
-
-(gen-class
-  :name com.narkisr.fake
-  :implements [fuse.Filesystem3]
-  :prefix "fs-")
-
-(def log (LogFactory/getLog (class com.narkisr.fake)))
-
-(defn log-access [name args]
-  (. log info (str name args)))
-
-(defmacro def-fs-fn
-  ([name args] `(def-fs-fn ~name ~args true 0 (identity 0)))
-  ([name args body] `(def-fs-fn ~name ~args true 0 ~body))
-  ([name args pre error] `(def-fs-fn ~name ~args ~pre ~error (identity 0)))
-  ([name args pre error body]
-    `(defn ~name ~(into ['this] args)
-      (if ~pre (do (log-access ~name ~args) ~body (identity 0)) ~error))))
+(gen-class :name com.narkisr.fake :implements [fuse.Filesystem3] :prefix "fs-")
 
 (def-fs-fn fs-getdir [path filler] (directory? (lookup path)) Errno/ENOTDIR
   (let [node (lookup path) type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK}]
@@ -42,7 +25,6 @@
       :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idioum
       :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (-> node :content alength))
       :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
-      Errno/ENOENT
       )))
 
 (def-fs-fn fs-open [path flags openSetter]
@@ -60,9 +42,9 @@
 
 (def-fs-fn fs-truncate [path size])
 
-(def-fs-fn fs-write [path fh isWritepage buf offset] false Errno/EROFS)
+(def-fs-fn fs-write [path fh is-writepage buf offset] false Errno/EROFS)
 
 ; file systems stats
-(def-fs-fn fs-statfs [statfsSetter]
-  (. statfsSetter set BLOCK_SIZE 1000 200 180 (-> root :files (. size)) 0 NAME_LENGTH))
+(def-fs-fn fs-statfs [statfs-setter]
+  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> root :files (. size)) 0 NAME_LENGTH))
 
