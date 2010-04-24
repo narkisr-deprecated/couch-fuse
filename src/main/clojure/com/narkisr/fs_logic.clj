@@ -14,9 +14,7 @@
   `(with-type ~(clojure.lang.Keyword/intern type)
     (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
-(def root
-  (create-node directory "" 0755 [:description "Root directory"]
-    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))}))
+(def root {}); must be binded when used to the actual root
 
 (defn lookup [path]
   (if (= path "/") root
@@ -34,5 +32,3 @@
       (toString [] (str "handle for " (:node metadata)))
       (finalize [] (println "finalizing")))))
 
-
-;(type (create-handle {:node "bla"}))

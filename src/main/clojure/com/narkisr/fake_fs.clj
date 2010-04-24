@@ -1,8 +1,11 @@
 (ns com.narkisr.fake-fs
   (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs)
-  (:import fuse.FuseFtypeConstants fuse.Errno ))
+  (:import fuse.FuseFtypeConstants fuse.Errno))
 
-; see @ http://omake.metaprl.org/prerelease/omake-dll-fuse.html
+
+(alter-var-root #'root
+  (fn [_] (create-node directory "" 0755 [:description "Root directory"]
+    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))})))
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
