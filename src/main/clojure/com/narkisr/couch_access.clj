@@ -7,7 +7,7 @@
     ))
 
 (def *host* "http://127.0.0.1:5984/")
-(def *db* "blog-import")
+(def *db* "fuse")
 
 (defmacro couch [fn & params]
   `(~fn ~*host* ~*db* ~@params))
@@ -24,5 +24,3 @@
 (defn couch-files []
   (reduce merge (map #(create-file-entry % (couch document-get %)) (all-ids))))
 
-
-;(couch-files (all-ids))
