@@ -4,7 +4,7 @@
   (with-meta x {:type type}))
 
 (defmacro def-fstype [name & keys]
-  `(defstruct ~name :name :mode :xattrs ~@keys))
+  `(defstruct ~name :name :mode :xattrs ~@keys :lastmod ))
 
 (def-fstype directory :files)
 (def-fstype file :content)
@@ -12,7 +12,7 @@
 
 (defmacro create-node [type & values]
   `(with-type ~(clojure.lang.Keyword/intern type)
-    (struct ~type ~@values)))
+    (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
 (def root
   (create-node directory "" 0755 [:description "Root directory"]
@@ -35,4 +35,4 @@
       (finalize [] (println "finalizing")))))
 
 
-(type (create-handle {:node "bla"}))
+;(type (create-handle {:node "bla"}))
