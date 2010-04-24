@@ -1,0 +1,5 @@
+* Make content read lazy (use a lazy fn instead of the actual value). 
+* Track changes via the changes API.
+* Enable write.
+* Enable attachments.
+

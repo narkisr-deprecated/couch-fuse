@@ -2,7 +2,6 @@
   (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-access)
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
-(defn db-files )
 (alter-var-root #'root
   (fn [_] (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files))))
 
