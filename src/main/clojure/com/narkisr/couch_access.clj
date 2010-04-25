@@ -2,8 +2,8 @@
   (:refer-clojure :exclude [contains?])
   (:use
     (com.narkisr fs-logic)
-    (couchdb client)
-    (clojure.contrib stream-utils str-utils seq-utils (str-utils2 :only [blank? contains?]) error-kit)
+    (couchdb (client :only [document-list document-get]))
+    (clojure.contrib (str-utils2 :only [contains?]) error-kit)
     ))
 
 (def *host* "http://127.0.0.1:5984/")

@@ -1,9 +1,10 @@
-(ns com.narkisr.fs-logic)
+(ns com.narkisr.fs-logic
+ (:use (clojure.contrib (def :only [defmacro-]))))
 
 (defn with-type [type x]
   (with-meta x {:type type}))
 
-(defmacro def-fstype [name & keys]
+(defmacro- def-fstype [name & keys]
   `(defstruct ~name :name :mode :xattrs ~@keys :lastmod ))
 
 (def-fstype directory :files)
