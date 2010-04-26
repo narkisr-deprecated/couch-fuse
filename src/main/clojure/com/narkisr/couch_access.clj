@@ -26,11 +26,13 @@
 (defn couch-files []
   (reduce merge (map #(create-file-entry %) (all-ids))))
 
-(defn fetch-content [file] (-> file :content (apply [])))
+(defn fetch-content
+  ([file] (-> file :content (apply [])))
+  ([file f] (-> file :content (apply []) f)))
 
 (defn fetch-size [file]
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."
-  (-> (str *host* *db* "/" (:name file)) resourcefully/head (get-in [:headers :content-length]) first Integer/parseInt (+ 1)))
+  (-> (str *host* *db* "/" (:name file)) resourcefully/head (get-in [:headers :content-length]) first Integer/parseInt (- 1)))
 
 ;(fetch-size {:name "e71a88687bef0c9e4db04f8191272638"})
 ;(alength (-> (str *host* *db* "/" "e71a88687bef0c9e4db04f8191272638") resourcefully/get :body-seq first (. getBytes)))

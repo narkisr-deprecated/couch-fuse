@@ -29,7 +29,6 @@
       )))
 
 (def-fs-fn fs-open [path flags openSetter]
-  "Settings the content on the handler makes multiple read call use the same content instead of re-GETing."
   (let [node (lookup path)]
     (. openSetter setFh (create-handle {:node node :content (fetch-content node)}))))
 
