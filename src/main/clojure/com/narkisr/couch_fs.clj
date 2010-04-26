@@ -24,17 +24,18 @@
   (let [node (lookup path)]
     (condp = (type node)
       :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idioum
-      :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (-> node :content alength))
+      :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (fetch-size node))
       :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
       )))
 
 (def-fs-fn fs-open [path flags openSetter]
+  "Settings the content on the handler makes multiple read call use the same content instead of re-GETing."
   (let [node (lookup path)]
-    (. openSetter setFh (create-handle {:node node}))))
+    (. openSetter setFh (create-handle {:node node :content (fetch-content node)}))))
 
 (def-fs-fn fs-read [path fh buf offset] (filehandle? fh) Errno/EBADF
-  (let [file (-> fh meta :node)]
-    (. buf put (file :content) offset (min (. buf remaining) (- (-> file :content alength) offset)))))
+  (let [file (-> fh meta :node) content (-> fh meta :content)]
+    (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
 
 (def-fs-fn fs-flush [path fh] (filehandle? fh) Errno/EBADF)
