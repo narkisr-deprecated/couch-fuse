@@ -1,2 +1,2 @@
 (use 'com.narkisr.mounter)
-(-main)
+(-main "fake")

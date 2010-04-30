@@ -4,7 +4,7 @@
   (:use com.narkisr.couch-fs))
 
 
-(defn -main []
+(defn -main [path]
   (FuseMount/mount
-    (into-array ["/home/ronen/CodeProjects/couch-fuse/fake" "-f"])
+    (into-array  [path "-f"])
     (com.narkisr.couch-fuse.) (LogFactory/getLog (class com.narkisr.mounter))))

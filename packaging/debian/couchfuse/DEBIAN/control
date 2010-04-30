@@ -1,0 +1,11 @@
+Package: couchfuse
+Version: 0.1-1
+Architecture: i386
+Maintainer: ronen <bla@bla.com>
+Installed-Size: 7408
+Depends: sun-java6-jdk (>= 6-15-1), fuse-utils
+Section: filesystems
+Priority: extra
+Homepage: narkisr.com
+Description: Couchdb FUSE filesystem
+ The couchdb fuse filesystem .....

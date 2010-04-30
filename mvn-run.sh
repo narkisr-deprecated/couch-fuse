@@ -28,4 +28,4 @@ export CLASSPATH
 
 
 fusermount -u fake
-mvn clojure:run -Djava.library.path=$LD_LIBRARY_PATH -o  
+mvn clojure:run -Djava.library.path=$LD_LIBRARY_PATH -o 
