@@ -1,7 +1,0 @@
-#!/bin/sh
-# postinst script for couchfuse
-#
-# see: dh_installdeb(1)
-
-chmod +x /usr/bin/couchfuse
-exit 0

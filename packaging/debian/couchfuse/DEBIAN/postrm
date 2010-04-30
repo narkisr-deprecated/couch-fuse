@@ -1,7 +1,0 @@
-#!/bin/sh
-# postrm script for couchfuse
-#
-# see: dh_installdeb(1)
-
-set -e
-#rm /use/bin/couchfuse
