@@ -4,4 +4,6 @@
 # see: dh_installdeb(1)
 
 chmod +x /usr/bin/couchfuse
+touch /var/log/couchfuse.log
+chmod 666 /var/log/couchfuse.log
 exit 0

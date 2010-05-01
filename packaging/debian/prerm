@@ -20,6 +20,7 @@ set -e
 case "$1" in
     remove|upgrade|deconfigure)
     rm /usr/bin/couchfuse
+    rm /var/log/couchfuse.log
     ;;
 
     failed-upgrade)
