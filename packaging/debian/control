@@ -1,7 +1,7 @@
 Source: couchfuse
 Section: filesystems
 Priority: extra
-Maintainer: ronen <bla@bla.com>
+Maintainer: narkisr <narkisr.dev@gmail.com>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.1
 Homepage: narkisr.com

@@ -1,13 +1,15 @@
 (ns com.narkisr.mounter
   (:gen-class)
-  (:import fuse.FuseMount org.apache.commons.logging.LogFactory)
+  (:import fuse.FuseMount org.apache.commons.logging.LogFactory java.io.File)
   (:use com.narkisr.couch-fs com.narkisr.couch-access clojure.contrib.command-line))
 
 (defn valid? [cond message]
-  (if cond (do (println message) (System/exit 1))))
+  (if (cond) (do (println message) (System/exit 1))))
 
 (defn validate [host db path]
-  (doseq [[cond error] [[(some empty? [db path]) "db and path are mandatory."] [(not (db-exists? host db)) "db does not exists."]]]
+  (doseq [[cond error] [[#(some empty? [db path]) "db and path are mandatory."]
+                        [#(not (db-exists? host db)) "db does not exists."]
+                        [#(not (-> path (File. ) (. exists))) "given mount path does not exist."]]]
     (valid? cond error)))
 
 (defn mount [host db path]
