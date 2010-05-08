@@ -9,10 +9,13 @@ In order to install:
 
 Usage:
 	$ couchfuse -db db_name -path mount_path
+	# each document is a file, rsync cat and other utilites work on them:
+	$ cat mount_path/5195395990213004497
+	$ rsync mount_path/ /some/backup/storage
 
 Known limitations:
 
 * At the moment the filesystem is read only (in the future write will be added).
 * Binary attachments are not supported.
-
+* This is an early release expect issues.
 
