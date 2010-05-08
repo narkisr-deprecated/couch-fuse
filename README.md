@@ -21,3 +21,5 @@ Known limitations:
 * Binary attachments are not supported.
 * This is an early release so expect issues.
 
+Build: this project uses http://github.com/dtrott/fuse4j and maven, in order to build it get fuse4j working and:
+	$ mvn clean install
