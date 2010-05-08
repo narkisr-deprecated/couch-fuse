@@ -28,4 +28,4 @@ export CLASSPATH
 
 
 #java -Djava.library.path=$LD_LIBRARY_PATH -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n fuse.FakeFilesystem $MOUNT_POINT -f
-mvn clean install -Djava.library.path=$LD_LIBRARY_PATH -o 
+mvn $@ -Djava.library.path=$LD_LIBRARY_PATH -o 
