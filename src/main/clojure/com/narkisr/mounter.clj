@@ -13,6 +13,7 @@
 (defn mount [host db path]
   (alter-var-root #'*host* (fn [_] (identity host)))
   (alter-var-root #'*db* (fn [_] (identity db)))
+  (bind-root)
   (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (LogFactory/getLog (class com.narkisr.mounter))))
 
 (defn -main [& args]

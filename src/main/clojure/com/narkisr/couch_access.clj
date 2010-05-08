@@ -10,8 +10,9 @@
 (def *host* "http://127.0.0.1:5984/")
 (def *db* "fuse")
 
-(defmacro couch [fn & params]
-  `(~fn ~*host* ~*db* ~@params))
+(defn couch [fn & params]
+  "Applies the binded couch configuration on the given fn, this cannot be a macro since the values are binded post the expansion stage"
+  (apply fn *host* *db* params))
 
 (defn- not-design-id [id]
   (not (contains? id "design")))
@@ -37,8 +38,3 @@
  (try (resourcefully/get (str host db))
    (catch java.io.IOException e nil)))
 
-(db-exists? *host* "fuse")
-;(fetch-size {:name "e71a88687bef0c9e4db04f8191272638"})
-;(alength (-> (str *host* *db* "/" "e71a88687bef0c9e4db04f8191272638") resourcefully/get :body-seq first (. getBytes)))
-
-;(map  #(str (-> (str *host* *db* "/" %) resourcefully/get :body-seq first (. length)) " vs " (fetch-size {:name %}) ) (all-ids))
