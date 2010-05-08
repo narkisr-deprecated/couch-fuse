@@ -22,4 +22,4 @@ Known limitations:
 * This is an early release so expect issues.
 
 Build: this project uses http://github.com/dtrott/fuse4j and maven, in order to build it get fuse4j working and hosted on you local repo:
-	$ mvn clean install
+	$ ./mvn-with-ld.sh clean install
