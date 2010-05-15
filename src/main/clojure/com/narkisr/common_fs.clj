@@ -1,7 +1,7 @@
 (ns com.narkisr.common-fs
   (:import org.apache.commons.logging.LogFactory))
 
-(defn log-access [this name args] (. (LogFactory/getLog (class this)) info (str name args)))
+(defn log-access [this name args] (. (LogFactory/getLog (class this)) debug (str name args)))
 
 (defmacro def-fs-fn
   ([name args] `(def-fs-fn ~name ~args true 0 (identity 0)))
