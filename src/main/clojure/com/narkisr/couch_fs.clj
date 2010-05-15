@@ -1,5 +1,5 @@
 (ns com.narkisr.couch-fs
-  (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-access)
+  (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-file)
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
@@ -10,20 +10,22 @@
 
 (gen-class :name com.narkisr.couch-fuse :implements [fuse.Filesystem3] :prefix "fs-")
 
+(def type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK})
+
 (def-fs-fn fs-getdir [path filler] (directory? (lookup path)) Errno/ENOTDIR
-  (let [node (lookup path) type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK}]
+  (let [node (lookup path)]
     (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
       (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))))
 
 
 (defn- apply-attr [setter node type length]
-  (. setter set (. node hashCode)
-    (bit-or type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
+    (. setter set (. node hashCode)
+      (bit-or type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
 
 (def-fs-fn fs-getattr [path setter] (some #{(type (lookup path))} [:directory :file :link]) Errno/ENOENT
   (let [node (lookup path)]
     (condp = (type node)
-      :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idioum
+      :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idiom
       :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (fetch-size node))
       :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
       )))

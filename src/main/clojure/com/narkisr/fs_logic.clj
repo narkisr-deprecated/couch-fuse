@@ -8,7 +8,7 @@
   `(defstruct ~name :name :mode :xattrs ~@keys :lastmod ))
 
 (def-fstype directory :files)
-(def-fstype file :content)
+(def-fstype file :content :size)
 (def-fstype link :link)
 
 (defmacro create-node [type & values]
