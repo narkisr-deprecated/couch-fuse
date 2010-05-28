@@ -19,8 +19,8 @@
 
 
 (defn- apply-attr [setter node type length]
-    (. setter set (. node hashCode)
-      (bit-or type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
+  (. setter set (. node hashCode)
+    (bit-or type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
 
 (def-fs-fn fs-getattr [path setter] (some #{(type (lookup path))} [:directory :file :link]) Errno/ENOENT
   (let [node (lookup path)]
@@ -45,7 +45,12 @@
 
 (def-fs-fn fs-truncate [path size])
 
-(def-fs-fn fs-write [path fh is-writepage buf offset] false Errno/EROFS)
+(def-fs-fn fs-write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
+  (println "here")
+  )
+
+(def-fs-fn utime [utime path atime mtime] )
+
 
 ; file systems stats
 (def-fs-fn fs-statfs [statfs-setter]
