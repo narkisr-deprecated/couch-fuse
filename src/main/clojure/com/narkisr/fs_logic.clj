@@ -1,5 +1,6 @@
 (ns com.narkisr.fs-logic
-  (:use (clojure.contrib (def :only [defmacro-]))))
+  (:import java.io.File)
+  (:use (clojure.contrib (def :only [defmacro-]) (seq-utils :only [flatten]))))
 
 (defn with-type [type x]
   (with-meta x {:type type}))
@@ -17,15 +18,19 @@
 
 (def root {}) ; must be binded when used to the actual root
 
-(defn lookup [path]
-  (if (= path "/") root
-    (let [f (java.io.File. path) parent (lookup (. f getParent))]
-      (if (= (type parent) :directory) (get-in parent [:files (. f getName)])))))
+;(defn lookup [path]
+;  (if (= path "/") root
+;    (let [f (java.io.File. path) parent (lookup (. f getParent))]
+;      (if (= (type parent) :directory) (get-in parent [:files (. f getName)])))))
 
 (defn lookup-keys [path]
-  (reduce (fn [r v] (conj r :files)) (map #(if (= % \/) 1 0) path) []))
+  (-> (mapcat #(if (= % \/) [:files]) path) (vec) (merge (. (File. path) getName))))
+
+(defn lookup [path]
+  (get-in (lookup-keys path) root))
 
 (defn directory? [node] (= (type node) :directory))
+
 (defn filehandle? [node] (= (type node) :filehandle))
 
 (defn create-handle [metadata]
@@ -37,4 +42,6 @@
       (finalize [] (println "finalizing")))))
 
 
-;(lookup-keys "/bla/bla")
+(lookup-keys "/bla/")
+;
+;(find-doc "combine" )
