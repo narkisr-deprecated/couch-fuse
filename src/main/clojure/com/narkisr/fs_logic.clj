@@ -32,7 +32,7 @@
 
 (defn split-path [path] (rest (partition path #"/")))
 
-(defn path-match-to-keys [path]
+(defn- path-match-to-keys [path]
   (match path
     ["/" dir "/" file] (list :files dir :files file)
     ["/" dir "/" & rest] (concat (list :files dir :files) (path-match-to-keys rest))
@@ -46,10 +46,16 @@
   (if (= path "/") root
     (get-in root (lookup-keys path))))
 
-(defn update [path key value]
+(defn- update [path key value]
   (alter-var-root #'root (fn [_]
     (if (= path "/") (assoc-in root (list key) value)
       (assoc-in root (concat (lookup-keys path) (list key)) value)))))
+
+(defn update-atime [path value]
+  (update path :lastmod (/ value 1000)))
+
+(defn update-mode [path value]
+  (update path :mode value))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]

@@ -39,11 +39,15 @@
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
 
-(def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF)
+(def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
+  (println "flushing")
+  )
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
 
-(def-fs-fn truncate [path size])
+(def-fs-fn truncate [path size]
+  (println "resizing")
+  )
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
   (let [b (byte-array 256)]
@@ -51,13 +55,17 @@
       (println (lookup-keys path))
       (println (. buf get b offset (min (. buf remaining) (- (alength b) offset)))))))
 
-(def-fs-fn mknod [path mod rdev])
+(def-fs-fn mknod [path mod rdev]
+  (println "mknode"))
 
-(def-fs-fn utime [utime path atime]
-  (lookup path)
-  )
+(def-fs-fn utime [path atime mtime]
+  (update-atime path mtime))
 
-(def-fs-fn fsync [path fh isDatasync])
+(def-fs-fn chmod [path mode]
+  (update-mode path mode))
+
+(def-fs-fn fsync [path fh isDatasync]
+  (println "fsync"))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

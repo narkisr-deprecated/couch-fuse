@@ -6,8 +6,8 @@
     {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))})))
 
 (deftest update-root
-  (update "/README" :lastmod 123)
-  (is (= (get-in root [:files "README" :lastmod]) 123)))
+  (update-atime "/README" 123)
+  (is (= (get-in root [:files "README" :lastmod]) (/ 123 1000))))
 
 (deftest key-looup-test
   (is (= (lookup-keys "/bla/name/bl.txt") '(:files "bla" :files "name" :files))))
