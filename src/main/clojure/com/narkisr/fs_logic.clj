@@ -30,17 +30,26 @@
 ;    (let [f (java.io.File. path) parent (lookup (. f getParent))]
 ;      (if (directory? parent) (get-in parent [:files (. f getName)])))))
 
-(defn lookup-keys [path]
+(defn split-path [path] (rest (partition path #"/")))
+
+(defn path-match-to-keys [path]
   (match path
     ["/" dir "/" file] (list :files dir :files file)
-    ["/" dir "/" & rest] (concat (list :files dir :files) (lookup-keys rest))
-    [dir "/" & rest] (concat (list dir :files) (lookup-keys rest))
-    ["/" file] (list :files file)
-    ))
+    ["/" dir "/" & rest] (concat (list :files dir :files) (path-match-to-keys rest))
+    [dir "/" & rest] (concat (list dir :files) (path-match-to-keys rest))
+    ["/" file] (list :files file)))
+
+(defn lookup-keys [path]
+  (path-match-to-keys (split-path path)))
 
 (defn lookup [path]
   (if (= path "/") root
-    (get-in root (lookup-keys (rest (partition path #"/"))))))
+    (get-in root (lookup-keys path))))
+
+(defn update [path key value]
+  (alter-var-root #'root (fn [_]
+    (if (= path "/") (assoc-in root (list key) value)
+      (assoc-in root (concat (lookup-keys path) (list key)) value)))))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]
@@ -49,11 +58,4 @@
       (meta [] (merge type-data metadata))
       (toString [] (str "handle for " (:node metadata)))
       (finalize [] (println "finalizing")))))
-
-
-;(lookup-keys (rest (partition "/bla/name/bl.txt" #"/")))
-;(lookup-keys (rest (partition "/1077214558877334645/ae70b718342bc0d140743709e21cdbe6.jpeg" #"/")))
-;(lookup-keys (rest (partition "/1077214558877334645" #"/")))
-;(lookup-keys (rest (partition "/1077214558877334645/" #"/")))
-;(lookup-keys (rest (partition "/" #"/")))
 

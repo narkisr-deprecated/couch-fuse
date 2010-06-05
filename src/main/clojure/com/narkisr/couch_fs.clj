@@ -53,7 +53,9 @@
 
 (def-fs-fn mknod [path mod rdev])
 
-(def-fs-fn utime [utime path atime])
+(def-fs-fn utime [utime path atime]
+  (lookup path)
+  )
 
 (def-fs-fn fsync [path fh isDatasync])
 
