@@ -38,6 +38,11 @@
             <artifactId>clojure-couchdb</artifactId>
             <version>0.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>pattern-match</groupId>
+            <artifactId>pattern-match</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

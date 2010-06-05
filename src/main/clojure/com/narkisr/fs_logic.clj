@@ -1,6 +1,8 @@
 (ns com.narkisr.fs-logic
+  (:refer-clojure :exclude [partition])
   (:import java.io.File)
-  (:use (clojure.contrib (def :only [defmacro-]) (seq-utils :only [flatten]))))
+  (:use (clojure.contrib (def :only [defmacro-]) (str-utils2 :only [partition]))
+    pattern-match))
 
 (defn with-type [type x]
   (with-meta x {:type type}))
@@ -18,20 +20,27 @@
 
 (def root {}) ; must be binded when used to the actual root
 
-;(defn lookup [path]
-;  (if (= path "/") root
-;    (let [f (java.io.File. path) parent (lookup (. f getParent))]
-;      (if (= (type parent) :directory) (get-in parent [:files (. f getName)])))))
-
-(defn lookup-keys [path]
-  (-> (mapcat #(if (= % \/) [:files]) path) (vec) (merge (. (File. path) getName))))
-
-(defn lookup [path]
-  (get-in (lookup-keys path) root))
 
 (defn directory? [node] (= (type node) :directory))
 
 (defn filehandle? [node] (= (type node) :filehandle))
+
+;(defn lookup [path]
+;  (if (= path "/") root
+;    (let [f (java.io.File. path) parent (lookup (. f getParent))]
+;      (if (directory? parent) (get-in parent [:files (. f getName)])))))
+
+(defn lookup-keys [path]
+  (match path
+    ["/" dir "/" file] (list :files dir :files file)
+    ["/" dir "/" & rest] (concat (list :files dir :files) (lookup-keys rest))
+    [dir "/" & rest] (concat (list dir :files) (lookup-keys rest))
+    ["/" file] (list :files file)
+    ))
+
+(defn lookup [path]
+  (if (= path "/") root
+    (get-in root (lookup-keys (rest (partition path #"/"))))))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]
@@ -42,6 +51,9 @@
       (finalize [] (println "finalizing")))))
 
 
-(lookup-keys "/bla/")
-;
-;(find-doc "combine" )
+;(lookup-keys (rest (partition "/bla/name/bl.txt" #"/")))
+;(lookup-keys (rest (partition "/1077214558877334645/ae70b718342bc0d140743709e21cdbe6.jpeg" #"/")))
+;(lookup-keys (rest (partition "/1077214558877334645" #"/")))
+;(lookup-keys (rest (partition "/1077214558877334645/" #"/")))
+;(lookup-keys (rest (partition "/" #"/")))
+
