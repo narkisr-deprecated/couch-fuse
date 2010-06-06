@@ -55,8 +55,8 @@
       (println (lookup-keys path))
       (println (. buf get b offset (min (. buf remaining) (- (alength b) offset)))))))
 
-(def-fs-fn mknod [path mod rdev]
-  (println "mknode"))
+(def-fs-fn mknod [path mode rdev]
+  (add-file path mode))
 
 (def-fs-fn utime [path atime mtime]
   (update-atime path mtime))
@@ -66,6 +66,9 @@
 
 (def-fs-fn fsync [path fh isDatasync]
   (println "fsync"))
+
+(def-fs-fn unlink [path]
+  (remove-file path))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

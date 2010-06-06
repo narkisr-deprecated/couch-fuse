@@ -12,6 +12,13 @@
 (deftest key-looup-test
   (is (= (lookup-keys "/bla/name/bl.txt") '(:files "bla" :files "name" :files))))
 
+(deftest node-creation
+  (add-file "/bla.txt" 0644)
+  (is (not (nil? (lookup "/bla.txt")))))
+
+(deftest node-deletion
+  (remove-file "/bla.txt")
+  (is (nil? (lookup "/bla.txt"))))
 
 ;(lookup-keys (rest (partition "/1077214558877334645/ae70b718342bc0d140743709e21cdbe6.jpeg" #"/")))
 ;(lookup-keys (rest (partition "/1077214558877334645" #"/")))
