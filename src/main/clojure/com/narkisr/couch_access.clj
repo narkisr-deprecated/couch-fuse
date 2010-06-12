@@ -4,7 +4,7 @@
   (:require [clojure.http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [document-list document-get view-get attachment-get attachment-list]))
+    (couchdb (client :only [document-list document-get document-update view-get attachment-get attachment-list]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
     (clojure.contrib.json read write)))
 
@@ -28,11 +28,14 @@
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."
   (fn [] (-> (str *host* *db* "/" path) resourcefully/head (get-in [:headers :content-length]) first Integer/parseInt (- 1))))
 
+(defn update-document [id contents]
+  (couch document-update id (read-json contents)))
+
 (defn couch-content [name]
   (fn [] (-> (str *host* *db* "/" name) resourcefully/get :body-seq first (. getBytes))))
 
 (defn couch-attachment-content [doc attachment]
-  (fn [] (->  (URL. (couch str "/" doc "/" attachment)) (. openConnection) (. getInputStream) to-byte-array)))
+  (fn [] (-> (URL. (couch str "/" doc "/" attachment)) (. openConnection) (. getInputStream) to-byte-array)))
 
 (defn db-exists? [host db]
   (try (resourcefully/get (str host db))

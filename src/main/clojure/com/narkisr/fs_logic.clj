@@ -25,10 +25,6 @@
 
 (defn filehandle? [node] (= (type node) :filehandle))
 
-;(defn lookup [path]
-;  (if (= path "/") root
-;    (let [f (java.io.File. path) parent (lookup (. f getParent))]
-;      (if (directory? parent) (get-in parent [:files (. f getName)])))))
 
 (defn split-path [path] (rest (partition path #"/")))
 

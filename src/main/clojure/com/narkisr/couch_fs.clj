@@ -1,9 +1,10 @@
 (ns com.narkisr.couch-fs
-  (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-file)
+  (:use (com.narkisr mocking fs-logic common-fs couch-file write-cache))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
   (alter-var-root #'root (fn [_] (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
+
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
@@ -38,24 +39,24 @@
   (let [file (-> fh meta :node) content (-> fh meta :content)]
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
-
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
-  (println "flushing")
-  )
+  (if (not (attachment? (-> fh meta :node)))
+    (do (update-file (-> fh meta :node) (String. (@write-cache path)))
+      (clear-cache path))))
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
 
 (def-fs-fn truncate [path size]
-  (println "resizing")
-  )
+  (println "resizing"))
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
-  (let [b (byte-array 256)]
-    (do
-      (println (lookup-keys path))
-      (println (. buf get b offset (min (. buf remaining) (- (alength b) offset)))))))
+  (let [b (byte-array 256) total-written (min (. buf remaining) (- (alength b) offset))]
+    (. buf get b offset total-written)
+    (update-cache path b)
+    total-written))
 
 (def-fs-fn mknod [path mode rdev]
+  ; I should consider how to add a node, since node name = couch id which I don't control nor do wish to
   (add-file path mode))
 
 (def-fs-fn utime [path atime mtime]
@@ -65,10 +66,13 @@
   (update-mode path mode))
 
 (def-fs-fn fsync [path fh isDatasync]
-  (println "fsync"))
+  (println (str "fsync" (String. (@write-cache path)))))
 
 (def-fs-fn unlink [path]
   (remove-file path))
+
+(def-fs-fn chown [path uid gid]
+  (println "chowning"))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
