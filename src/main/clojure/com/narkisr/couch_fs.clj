@@ -40,14 +40,13 @@
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
-  (if (not (attachment? (-> fh meta :node)))
+  (if (and (not (attachment? (-> fh meta :node))) (contains? @write-cache path))
     (do (update-file (-> fh meta :node) (String. (@write-cache path)))
       (clear-cache path))))
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
 
-(def-fs-fn truncate [path size]
-  (println "resizing"))
+(def-fs-fn truncate [path size] )
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
   (let [b (byte-array 256) total-written (min (. buf remaining) (- (alength b) offset))]
