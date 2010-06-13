@@ -3,9 +3,9 @@
   (:import fuse.FuseFtypeConstants fuse.Errno))
 
 
-(alter-var-root #'root
+(dosync (ref-set root
   (fn [_] (create-node directory "" 0755 [:description "Root directory"]
-    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))})))
+    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))}))))
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
@@ -49,5 +49,5 @@
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
-  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> root :files (. size)) 0 NAME_LENGTH))
+  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
 

@@ -28,7 +28,7 @@
 (defn create-folder [path mode]
   (let [name (-> path (File.) (.getName))]
     (create-document name)
-    (add-file path (create-document-folder name))))
+    (add-file path ((create-document-folder name) name))))
 
 (defn fetch-content
   ([file] (-> file :content (apply [])))

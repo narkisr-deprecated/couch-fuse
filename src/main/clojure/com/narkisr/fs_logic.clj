@@ -18,7 +18,7 @@
   `(with-type ~(clojure.lang.Keyword/intern type)
     (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
-(def root {}) ; must be binded when used to the actual root
+(def root (ref {})) ; must be binded when used to the actual root
 
 
 (defn directory? [node] (= (type node) :directory))
@@ -39,13 +39,13 @@
   (path-match-to-keys (split-path path)))
 
 (defn lookup [path]
-  (if (= path "/") root
-    (get-in root (lookup-keys path))))
+  (if (= path "/") @root
+    (get-in @root (lookup-keys path))))
 
 (defn- update [path key value]
-  (alter-var-root #'root (fn [_]
-    (if (= path "/") (assoc-in root (list key) value)
-      (assoc-in root (concat (lookup-keys path) (list key)) value)))))
+  (dosync (ref-set root
+    (if (= path "/") (assoc-in @root (list key) value)
+      (assoc-in @root (concat (lookup-keys path) (list key)) value)))))
 
 (defn update-atime [path value]
   (update path :lastmod (/ value 1000)))
@@ -54,9 +54,10 @@
   (update path :mode value))
 
 (defn add-file [path file]
-  (alter-var-root #'root (fn [_] (assoc-in root (lookup-keys path) file))))
+  (dosync (ref-set root (assoc-in @root (lookup-keys path) file))))
 
-(defn remove-file [path] (alter-var-root #'root (fn [_] (assoc-in root (lookup-keys path) nil))))
+(defn remove-file [path]
+  (dosync (ref-set root (assoc-in @root (lookup-keys path) nil))))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]

@@ -1,13 +1,13 @@
 (ns com.narkisr.fs-logic-test
   (:use clojure.contrib.test-is com.narkisr.fs-logic com.narkisr.mocking))
 
-(alter-var-root #'root
+(dosync (ref-set root
   (fn [_] (create-node directory "" 0755 [:description "Root directory"]
-    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))})))
+    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))}))))
 
 (deftest update-root
   (update-atime "/README" 123)
-  (is (= (get-in root [:files "README" :lastmod]) (/ 123 1000))))
+  (is (= (get-in @root [:files "README" :lastmod]) (/ 123 1000))))
 
 (deftest key-looup-test
   (is (= (lookup-keys "/bla/name/bl.txt") '(:files "bla" :files "name" :files))))

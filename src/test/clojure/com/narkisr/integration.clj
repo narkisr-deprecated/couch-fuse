@@ -33,8 +33,8 @@
     (is (= (. temp exists) false))
     (is (thrown? java.io.FileNotFoundException (spit temp "{\"some\":value}")))))
 
+; uncomment once rmdir works!
 ;(deftest mkdir-on-root
-;  (let [dir (File. "fake/myfolder")]
-;    (println (lookup "fake/myfolder"))
+;  (let [dir (File. "fake/#bla#")]
 ;    (is (= (. dir mkdir) true))
 ;    ))

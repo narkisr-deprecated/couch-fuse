@@ -3,7 +3,7 @@
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
-  (alter-var-root #'root (fn [_] (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
+  (dosync (ref-set root (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
 
 
 (def NAME_LENGTH 1024)
@@ -86,4 +86,4 @@
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
-  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> root :files (. size)) 0 NAME_LENGTH))
+  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
