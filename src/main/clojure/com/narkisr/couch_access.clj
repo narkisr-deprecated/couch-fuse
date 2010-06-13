@@ -4,7 +4,7 @@
   (:require [clojure.http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [document-list document-get document-update view-get attachment-get attachment-list]))
+    (couchdb (client :only [document-list document-get document-update document-create view-get attachment-get attachment-list]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
     (clojure.contrib.json read write)))
 
@@ -30,6 +30,9 @@
 
 (defn update-document [id contents]
   (couch document-update id (read-json contents)))
+
+(defn create-document [id]
+  (couch document-create id {}))
 
 (defn couch-content [name]
   (fn [] (-> (str *host* *db* "/" name) resourcefully/get :body-seq first (. getBytes))))

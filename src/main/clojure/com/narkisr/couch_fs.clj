@@ -46,7 +46,7 @@
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
 
-(def-fs-fn truncate [path size] )
+(def-fs-fn truncate [path size])
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
   (let [b (byte-array 256) total-written (min (. buf remaining) (- (alength b) offset))]
@@ -54,9 +54,13 @@
     (update-cache path b)
     total-written))
 
-(def-fs-fn mknod [path mode rdev]
+(def-fs-fn mknod [path mode rdev] Errno/EROFS
   ; I should consider how to add a node, since node name = couch id which I don't control nor do wish to
-  (add-file path mode))
+  ;  (add-file path mode)
+  )
+
+(def-fs-fn mkdir [path mode]
+  (create-folder path mode))
 
 (def-fs-fn utime [path atime mtime]
   (update-atime path mtime))
@@ -72,6 +76,13 @@
 
 (def-fs-fn chown [path uid gid]
   (println "chowning"))
+
+(def-fs-fn rename [from to]
+  (println "renaming"))
+
+(def-fs-fn rmdir [path]
+  (println "rmdir")
+  )
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

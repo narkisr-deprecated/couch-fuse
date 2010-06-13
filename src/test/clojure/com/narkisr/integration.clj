@@ -2,7 +2,7 @@
   (:import java.io.File)
   (:use
     (clojure.contrib.json read write)
-    (com.narkisr (mounter :only [mount-with-group]))
+    (com.narkisr (mounter :only [mount-with-group]) fs-logic  )
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
 (def file-path "/media/SSD_DRIVE/CodeProjects/couch-fuse/fake/1432286694230195736/1432286694230195736.json")
@@ -19,9 +19,6 @@
 ; these tests actually mount a live couchdb therefor they require one up
 (use-fixtures :once mount-and-sleep)
 
-(defn- echoable-json [value]
-  (str "\"" (re-gsub #"\"" "'" (json-str value)) "\""))
-
 (deftest in-place-edit
   "Note that using :key won't work when assoc or dissoc since couch is saving it as a string."
   (let [json #(-> (File. file-path) slurp* read-json)]
@@ -31,4 +28,13 @@
     (is (= (contains? (json) "key") false))
     ))
 
+(deftest file-creation-should-fail
+  (let [temp (File. "fake/bla.txt")]
+    (is (= (. temp exists) false))
+    (is (thrown? java.io.FileNotFoundException (spit temp "{\"some\":value}")))))
 
+;(deftest mkdir-on-root
+;  (let [dir (File. "fake/myfolder")]
+;    (println (lookup "fake/myfolder"))
+;    (is (= (. dir mkdir) true))
+;    ))

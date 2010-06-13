@@ -13,8 +13,9 @@
   (is (= (lookup-keys "/bla/name/bl.txt") '(:files "bla" :files "name" :files))))
 
 (deftest node-creation
-  (add-file "/bla.txt" 0644)
-  (is (not (nil? (lookup "/bla.txt")))))
+  (let [file (create-node file "bla.txt" 0644 [:description "" :mimetype ""] nil nil)]
+    (add-file "/bla.txt" file)
+    (is (= file (lookup "/bla.txt")))))
 
 (deftest node-deletion
   (remove-file "/bla.txt")

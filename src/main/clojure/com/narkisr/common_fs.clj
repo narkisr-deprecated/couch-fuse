@@ -2,7 +2,7 @@
   (:import org.apache.commons.logging.LogFactory))
 
 (defn log-info [this text]
-  (. (LogFactory/getLog (class this)) trace text))
+  (. (LogFactory/getLog (class this)) info text))
 
 
 (defmacro def-fs-fn
@@ -12,6 +12,6 @@
   ([name args pre error body]
     (let [fn-name (clojure.lang.Symbol/intern (str "fs-" name))]
       `(defn ~fn-name ~(into ['this] args)
-        (if ~pre (do (log-info 'this (str ~fn-name ~args)) ~body (log-info 'this ~args) (identity 0)) ~error)))))
+        (if ~pre (do (log-info 'this (str "calling - > " ~fn-name )) ~body  (identity 0)) ~error)))))
 
 

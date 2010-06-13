@@ -1,4 +1,5 @@
 (ns com.narkisr.couch-file
+  (:import java.io.File)
   (:use com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-access))
 
 (defn join-maps [& maps]
@@ -23,6 +24,11 @@
 (defn update-file [file contents]
   (let [attrs (apply hash-map (file :xattrs))]
     (update-document (attrs :couch-id) contents)))
+
+(defn create-folder [path mode]
+  (let [name (-> path (File.) (.getName))]
+    (create-document name)
+    (add-file path (create-document-folder name))))
 
 (defn fetch-content
   ([file] (-> file :content (apply [])))

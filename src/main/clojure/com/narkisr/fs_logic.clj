@@ -53,10 +53,8 @@
 (defn update-mode [path value]
   (update path :mode value))
 
-(defn add-file [path mode]
-  (alter-var-root #'root (fn [_]
-    (let [f (File. path)]
-      (assoc-in root (lookup-keys path) (create-node file (. f getName) 0644 [:description "" :mimetype ""] #() #(identity 0)))))))
+(defn add-file [path file]
+  (alter-var-root #'root (fn [_] (assoc-in root (lookup-keys path) file))))
 
 (defn remove-file [path] (alter-var-root #'root (fn [_] (assoc-in root (lookup-keys path) nil))))
 
