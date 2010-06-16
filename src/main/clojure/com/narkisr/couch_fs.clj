@@ -72,7 +72,7 @@
   (println (str "fsync" (String. (@write-cache path)))))
 
 (def-fs-fn unlink [path]
-  (remove-file path))
+  )
 
 (def-fs-fn chown [path uid gid]
   (println "chowning"))
@@ -81,8 +81,7 @@
   (println "renaming"))
 
 (def-fs-fn rmdir [path]
-  (println "rmdir")
-  )
+  (delete-folder path))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

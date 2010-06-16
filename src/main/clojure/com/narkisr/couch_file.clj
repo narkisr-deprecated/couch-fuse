@@ -25,8 +25,15 @@
   (let [attrs (apply hash-map (file :xattrs))]
     (update-document (attrs :couch-id) contents)))
 
+(defn- fname [path]
+  (-> path (File.) (.getName)))
+
+(defn delete-folder [path]
+  (delete-document (fname path))
+  (remove-file path))
+
 (defn create-folder [path mode]
-  (let [name (-> path (File.) (.getName))]
+  (let [name (fname path)]
     (create-document name)
     (add-file path ((create-document-folder name) name))))
 
