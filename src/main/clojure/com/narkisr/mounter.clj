@@ -25,7 +25,7 @@
   (alter-var-root #'*host* (fn [_] (identity host)))
   (alter-var-root #'*db* (fn [_] (identity db)))
   (bind-root)
-  (FuseMount/mountWithThreadGroup (into-array [path "-f"]) (com.narkisr.couch-fuse.) (creat-log) (java.lang.ThreadGroup. group)))
+  (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (java.lang.ThreadGroup. group) (creat-log)))
 
 (defn -main [& args]
   (with-command-line args "Couchdb fuse filesystem 0.1"
