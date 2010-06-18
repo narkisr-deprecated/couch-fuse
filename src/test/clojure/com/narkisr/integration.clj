@@ -5,7 +5,7 @@
     (com.narkisr (mounter :only [mount-with-group]) fs-logic)
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
-(def file-path "/media/SSD_DRIVE/CodeProjects/couch-fuse/fake/1432286694230195736/1432286694230195736.json")
+(def file-path "fake/1432286694230195736/1432286694230195736.json")
 
 (defn mount-and-sleep [f]
   (println "mounting fake")
