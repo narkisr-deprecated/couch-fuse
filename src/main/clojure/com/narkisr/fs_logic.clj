@@ -20,10 +20,10 @@
 
 (def root (ref {})) ; must be binded when used to the actual root
 
-
 (defn directory? [node] (= (type node) :directory))
 
 (defn filehandle? [node] (= (type node) :filehandle))
+
 
 
 (defn split-path [path] (rest (partition path #"/")))
@@ -41,6 +41,9 @@
 (defn lookup [path]
   (if (= path "/") @root
     (get-in @root (lookup-keys path))))
+
+(defn under-root? [path]
+  (= (lookup (-> path (File.) (.getParent))) @root))
 
 (defn- update [path key value]
   (dosync (ref-set root

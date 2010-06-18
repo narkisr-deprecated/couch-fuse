@@ -33,9 +33,13 @@
     (is (= (. temp exists) false))
     (is (thrown? java.io.FileNotFoundException (spit temp "{\"some\":value}")))))
 
-; uncomment once rmdir works!
-(deftest mkdir-on-root
-  (let [name "fake/#bla#" dir (File. name)]
-    (sh "rm" "-r" name)
-    (is (= (. dir mkdir) true))
+(deftest mkdir-only-on-root
+  (do-template (do
+    (is (= (-> _1 (File.) (.mkdir)) _2))
+    (is (= (sh "rm" "-r" _1) _3)))
+    "fake/bla" true ""
+    "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n"
     ))
+
+
+

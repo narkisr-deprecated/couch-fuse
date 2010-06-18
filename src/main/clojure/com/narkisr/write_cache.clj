@@ -3,7 +3,6 @@
 
 (def write-cache (ref {}))
 
-
 (defn update-cache [path bytes]
   (dosync
     (ref-set write-cache (if (contains? @write-cache path)

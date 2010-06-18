@@ -5,7 +5,6 @@
 (defn bind-root []
   (dosync (ref-set root (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
 
-
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
 
@@ -54,12 +53,12 @@
     (update-cache path b)
     total-written))
 
-(def-fs-fn mknod [path mode rdev] Errno/EROFS
+(def-fs-fn mknod [path mode rdev] Errno/EPERM
   ; I should consider how to add a node, since node name = couch id which I don't control nor do wish to
   ;  (add-file path mode)
   )
 
-(def-fs-fn mkdir [path mode]
+(def-fs-fn mkdir [path mode] (under-root? path) Errno/EPERM
   (create-folder path mode))
 
 (def-fs-fn utime [path atime mtime]
@@ -68,19 +67,15 @@
 (def-fs-fn chmod [path mode]
   (update-mode path mode))
 
-(def-fs-fn fsync [path fh isDatasync]
-  (println (str "fsync" (String. (@write-cache path)))))
+(def-fs-fn fsync [path fh isDatasync])
 
-(def-fs-fn unlink [path]
-  )
+(def-fs-fn unlink [path])
 
-(def-fs-fn chown [path uid gid]
-  (println "chowning"))
+(def-fs-fn chown [path uid gid])
 
-(def-fs-fn rename [from to]
-  (println "renaming"))
+(def-fs-fn rename [from to])
 
-(def-fs-fn rmdir [path]
+(def-fs-fn rmdir [path] (under-root? path) Errno/EPERM
   (delete-folder path))
 
 ; file systems stats
