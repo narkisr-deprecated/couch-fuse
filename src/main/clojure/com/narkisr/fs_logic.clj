@@ -24,8 +24,6 @@
 
 (defn filehandle? [node] (= (type node) :filehandle))
 
-
-
 (defn split-path [path] (rest (partition path #"/")))
 
 (defn- path-match-to-keys [path]

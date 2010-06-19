@@ -5,16 +5,18 @@
     (com.narkisr (mounter :only [mount-with-group]) fs-logic)
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
-(def file-path "fake/1432286694230195736/1432286694230195736.json")
+(def file-path)
 
 (defn mount-and-sleep [f]
-  (println "mounting fake")
-  (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
-  (java.lang.Thread/sleep 2000)
-  (f)
-  (println "unmounting fake")
-  (sh "fusermount" "-u" "fake")
-  )
+  (let [uuid (java.util.UUID/randomUUID)]
+    (def file-path (str "fake/" uuid "/" uuid ".json"))
+    (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
+    (java.lang.Thread/sleep 2000)
+    (sh "mkdir" (str "fake/" uuid))
+    (f)
+    (sh "rm" "-r" (str "fake/" uuid))
+    (sh "fusermount" "-u" "fake")
+    ))
 
 ; these tests actually mount a live couchdb therefor they require one up
 (use-fixtures :once mount-and-sleep)
