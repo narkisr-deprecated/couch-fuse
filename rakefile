@@ -7,7 +7,7 @@ version =  pom.elements["project"].elements["version"].text
 name_ver = "#{name}-#{version}"
 jar = "#{name_ver}-jar-with-dependencies.jar"
 tar = "#{name_ver}.tar.gz"
-fuse4j = '/home/ronen/CodeProjects/fuse4j/native/'
+fuse4j = '../fuse4j/native/'
 
 task :default => [:package]
 
