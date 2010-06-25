@@ -11,7 +11,7 @@ fuse4j = '/home/ronen/CodeProjects/fuse4j/native/'
 
 task :default => [:package]
 
-file jar do
+file jar => 'native/javafs' do
 	sh 'sudo touch /var/log/couchfuse.log'
 	sh 'sudo chmod 666 /var/log/couchfuse.log'
 	sh './mvn-with-ld.sh assembly:assembly' unless File.exists? "target/#{jar}"

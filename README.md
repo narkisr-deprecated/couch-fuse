@@ -21,5 +21,12 @@ Known limitations:
 * Binary attachments are not supported.
 * This is an early release so expect issues.
 
-Build: this project uses http://github.com/dtrott/fuse4j and maven, in order to build it get fuse4j working and hosted on you local repo:
-	$ ./mvn-with-ld.sh clean install
+Build: 
+        $ sudo aptitude install dh-make libfuse-dev sun-java6-jdk maven2 ruby rake
+        $ git clone git://github.com/narkisr/fuse4j.git
+        $ cd fuse4j/maven
+        $ maven clean install
+        $ cd ..
+        $ git clone git://github.com/narkisr/couch-fuse.git
+        $ cd couch-fuse
+        $ rake deb
