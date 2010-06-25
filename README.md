@@ -11,9 +11,11 @@ In order to install:
 Usage:
 
 	$ couchfuse -db db_name -path mount_path
-	# each document is a file, rsync cat and other utilites work on them:
+	# each document is represented by folder, rsync cat and other utilites work on them:
 	$ cat mount_path/5195395990213004497
 	$ rsync mount_path/ /some/backup/storage
+        # creating new documents is mkdir away
+        $ 
 
 Known limitations:
 
@@ -22,11 +24,12 @@ Known limitations:
 * This is an early release so expect issues.
 
 Build: 
-        $ sudo aptitude install dh-make libfuse-dev sun-java6-jdk maven2 ruby rake
+        $ sudo aptitude install dh-make libfuse-dev sun-java6-jdk maven2 ruby rake couchdb
         $ git clone git://github.com/narkisr/fuse4j.git
         $ cd fuse4j/maven
         $ maven clean install
         $ cd ..
         $ git clone git://github.com/narkisr/couch-fuse.git
         $ cd couch-fuse
+        $ curl -X PUT http://localhost:5984/playground # a db used in testing
         $ rake deb

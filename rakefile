@@ -14,6 +14,7 @@ task :default => [:package]
 file jar => 'native/javafs' do
 	sh 'sudo touch /var/log/couchfuse.log'
 	sh 'sudo chmod 666 /var/log/couchfuse.log'
+	mkdir 'fake' unless File.exists? 'fake'
 	sh './mvn-with-ld.sh assembly:assembly' unless File.exists? "target/#{jar}"
 	cp "target/#{jar}" , pwd
 end 
