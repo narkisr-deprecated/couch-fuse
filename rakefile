@@ -1,0 +1,52 @@
+require 'rake/packagetask'
+require 'rexml/document'
+
+pom = REXML::Document.new File.new("pom.xml")
+name =  pom.elements["project"].elements["name"].text
+version =  pom.elements["project"].elements["version"].text
+jar = "#{name}-#{version}-jar-with-dependencies.jar"
+tar = "#{name}-#{version}.tar.gz"
+fuse4j = '/home/ronen/CodeProjects/fuse4j/native/'
+
+task :default => [:package]
+
+file jar do
+	sh './mvn-with-ld.sh assembly:assembly' unless File.exists? "target/#{jar}"
+        cp "target/#{jar}" , pwd
+end 
+
+file 'javafs','libjavafs.so' => :fusebuild do
+	cp "#{fuse4j}/javafs" , '.'
+	cp "#{fuse4j}/libjavafs.so" , '.'
+end
+
+ Rake::PackageTask.new(name, version)  do |pack|
+	pack.need_tar_gz = true
+	pack.package_files.include(jar,'mount.sh','javafs','libjavafs.so')
+end
+
+
+task :fusebuild do
+	origin = pwd
+	chdir fuse4j
+	sh 'rake clean && rake'
+	chdir origin
+end
+
+
+task :clean  do
+	([jar] +%w( pkg sandbox javafs libjavafs.so)).each {|f| rm_r f if File.exists? f}
+	sh 'mvn clean'
+end
+
+task :deb => [:package] do 
+	mkdir('sandbox') unless File.exists?('sandbox')
+	cp "pkg/#{tar}" , 'sandbox'
+	cd 'sandbox'
+	sh "tar -xvzf #{tar}"
+	mv tar , "#{name}-#{version}"
+	cd "#{name}-#{version}"
+	sh "dh_make -e narkisr@bla.com -c GPL -f #{tar} -s -p #{name}_#{version}"
+	rm "../#{name}_#{version}.orig.tar.gz"
+	sh 'sudo dpkg-buildpackage'
+end
