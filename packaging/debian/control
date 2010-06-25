@@ -1,4 +1,4 @@
-Source: couchfuse
+Source: couch-fuse
 Section: filesystems
 Priority: extra
 Maintainer: narkisr <narkisr.dev@gmail.com>
@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.1
 Homepage: narkisr.com
 
-Package: couchfuse
+Package: couch-fuse
 Architecture: any
 Depends:  sun-java6-jdk (>=6-15-1), fuse-utils
 Description: Couchdb FUSE filesystem

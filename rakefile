@@ -15,14 +15,30 @@ file jar do
         cp "target/#{jar}" , pwd
 end 
 
-file 'javafs','libjavafs.so' => :fusebuild do
-	cp "#{fuse4j}/javafs" , '.'
-	cp "#{fuse4j}/libjavafs.so" , '.'
+file 'couchfuse' do
+	path = '/usr/lib/jvm/java-6-sun/jre/lib/i386/server'
+	script = <<-eos
+#!/bin/sh
+java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} $@ -run-valid true
+exitValue=$? 
+
+if [ $exitValue != 0 ] 
+then 
+ exit $exitValue 
+fi 
+nohup java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} $@  &
+	eos
+	File.open('couchfuse', 'w') do |f|  f.puts script end       
 end
 
- Rake::PackageTask.new(name, version)  do |pack|
+file 'native/javafs','native/libjavafs.so' => :fusebuild do
+	mkdir 'native' unless File.exists? 'native'
+	%w(javafs  libjavafs.so).each {|f| cp "#{fuse4j}#{f}" , 'native'}
+end
+
+Rake::PackageTask.new(name, version)  do |pack|
 	pack.need_tar_gz = true
-	pack.package_files.include(jar,'mount.sh','javafs','libjavafs.so')
+	pack.package_files.include(jar,'couchfuse','native/javafs','native/libjavafs.so')
 end
 
 
@@ -35,18 +51,25 @@ end
 
 
 task :clean  do
-	([jar] +%w( pkg sandbox javafs libjavafs.so)).each {|f| rm_r f if File.exists? f}
+	([jar] +%w( pkg javafs libjavafs.so couchfuse)).each {|f| rm_r f if File.exists? f}
+	sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
 	sh 'mvn clean'
 end
 
-task :deb => [:package] do 
+task :deb => [:sandbox] do 
+	['control','rules','dirs','postinst','prerm'].each{|f| cp "../../packaging/debian/#{f}",'debian/' } 
+	sh 'sudo dpkg-buildpackage'
+end
+
+task :sandbox => [:package] do
 	mkdir('sandbox') unless File.exists?('sandbox')
 	cp "pkg/#{tar}" , 'sandbox'
 	cd 'sandbox'
 	sh "tar -xvzf #{tar}"
 	mv tar , "#{name}-#{version}"
 	cd "#{name}-#{version}"
-	sh "dh_make -e narkisr@bla.com -c GPL -f #{tar} -s -p #{name}_#{version}"
+	sh "dh_make -e narkisr.dev@gmail.com -c apache -f #{tar} -s -p #{name}_#{version}"
 	rm "../#{name}_#{version}.orig.tar.gz"
-	sh 'sudo dpkg-buildpackage'
+	Dir['debian/*.ex'].each {|fn| rm fn rescue nil}
 end
+

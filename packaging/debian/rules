@@ -38,10 +38,10 @@ install: build
 	dh_testroot
 	dh_prep  
 	dh_installdirs
-	mkdir -p $(CURDIR)/debian/couchfuse/usr/share/couchfuse/
-	cp -r native $(CURDIR)/debian/couchfuse/usr/share/couchfuse/
-	cp *.jar $(CURDIR)/debian/couchfuse/usr/share/couchfuse/
-	cp couchfuse $(CURDIR)/debian/couchfuse/usr/bin/
+	# mkdir -p $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
+	cp -r native $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
+	cp *.jar $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
+	cp couchfuse $(CURDIR)/debian/couch-fuse/usr/bin/
 
 
 # Build architecture-independent files here.
