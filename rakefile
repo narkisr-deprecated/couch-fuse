@@ -4,29 +4,33 @@ require 'rexml/document'
 pom = REXML::Document.new File.new("pom.xml")
 name =  pom.elements["project"].elements["name"].text
 version =  pom.elements["project"].elements["version"].text
-jar = "#{name}-#{version}-jar-with-dependencies.jar"
-tar = "#{name}-#{version}.tar.gz"
+name_ver = "#{name}-#{version}"
+jar = "#{name_ver}-jar-with-dependencies.jar"
+tar = "#{name_ver}.tar.gz"
 fuse4j = '/home/ronen/CodeProjects/fuse4j/native/'
 
 task :default => [:package]
 
 file jar do
+	sh 'sudo touch /var/log/couchfuse.log'
+	sh 'sudo chmod 666 /var/log/couchfuse.log'
 	sh './mvn-with-ld.sh assembly:assembly' unless File.exists? "target/#{jar}"
-        cp "target/#{jar}" , pwd
+	cp "target/#{jar}" , pwd
 end 
 
 file 'couchfuse' do
-	path = '/usr/lib/jvm/java-6-sun/jre/lib/i386/server'
+	server_path = (`uname -a`.include?("i686") && "i386") || "amd64"
+	path = "/usr/lib/jvm/java-6-sun/jre/lib/#{server_path}/server"
+	launch = "java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} '#{name_ver} filesystem' $@"
 	script = <<-eos
-#!/bin/sh
-java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} $@ -run-valid true
-exitValue=$? 
-
-if [ $exitValue != 0 ] 
-then 
- exit $exitValue 
-fi 
-nohup java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} $@  &
+	 #!/bin/sh
+	#{launch} -run-valid true 
+	 exitValue=$? 
+	 if [ $exitValue != 0 ] 
+	 then 
+	  exit $exitValue 
+	 fi 
+	 nohup #{launch}  &
 	eos
 	File.open('couchfuse', 'w') do |f|  f.puts script end       
 end
@@ -41,7 +45,6 @@ Rake::PackageTask.new(name, version)  do |pack|
 	pack.package_files.include(jar,'couchfuse','native/javafs','native/libjavafs.so')
 end
 
-
 task :fusebuild do
 	origin = pwd
 	chdir fuse4j
@@ -49,9 +52,8 @@ task :fusebuild do
 	chdir origin
 end
 
-
 task :clean  do
-	([jar] +%w( pkg javafs libjavafs.so couchfuse)).each {|f| rm_r f if File.exists? f}
+	([jar] +%w( pkg javafs native)).each {|f| rm_r f if File.exists? f}
 	sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
 	sh 'mvn clean'
 end
@@ -66,9 +68,9 @@ task :sandbox => [:package] do
 	cp "pkg/#{tar}" , 'sandbox'
 	cd 'sandbox'
 	sh "tar -xvzf #{tar}"
-	mv tar , "#{name}-#{version}"
-	cd "#{name}-#{version}"
-	sh "dh_make -e narkisr.dev@gmail.com -c apache -f #{tar} -s -p #{name}_#{version}"
+	mv tar , name_ver
+	cd name_ver
+	sh "echo 'skip confirmation' | dh_make -e narkisr.dev@gmail.com -c apache -f #{tar} -s -p #{name}_#{version}"
 	rm "../#{name}_#{version}.orig.tar.gz"
 	Dir['debian/*.ex'].each {|fn| rm fn rescue nil}
 end

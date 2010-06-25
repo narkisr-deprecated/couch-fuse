@@ -27,8 +27,8 @@
   (bind-root)
   (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (java.lang.ThreadGroup. group) (creat-log)))
 
-(defn -main [& args]
-  (with-command-line args "Couchdb fuse filesystem 0.1"
+(defn -main [version & args]
+  (with-command-line args version
     [[run-valid? "runs validation only" false] [host "Couchdb host name" "http://127.0.0.1:5984/"]
      [db "Couchdb db name"] [path "Mount path on local filesystem"] remaining]
     (if run-valid? (validate host db path) (mount host db path))))
