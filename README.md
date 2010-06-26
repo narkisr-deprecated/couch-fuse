@@ -1,6 +1,8 @@
 Couch-fuse is a Couchdb Fuse filesystem it enables a mount of a Couchdb databse into a local folder.
 This comes handy for backup, editing and any other task that it easy to accomplish via a filesystem interface.
 
+<object width="480" height="385"><param name="movie" value="http://www.youtube.com/v/ps3-CnqKVxU&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/ps3-CnqKVxU&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed></object>
+
 In order to install:
 
 	$ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.2-1_i386.deb
