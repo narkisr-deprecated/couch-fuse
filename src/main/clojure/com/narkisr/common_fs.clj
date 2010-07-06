@@ -4,6 +4,8 @@
 (defn log-info [this text]
   (. (LogFactory/getLog (class this)) info text))
 
+(defn log-warn [this text]
+  (. (LogFactory/getLog (class this)) warn text))
 
 (defmacro def-fs-fn
   ([name args] `(def-fs-fn ~name ~args true 0 (identity 0)))
@@ -12,6 +14,6 @@
   ([name args pre error body]
     (let [fn-name (clojure.lang.Symbol/intern (str "fs-" name))]
       `(defn ~fn-name ~(into ['this] args)
-        (if ~pre (do (log-info 'this (str "calling - > " ~fn-name )) ~body  (identity 0)) ~error)))))
+        (if ~pre (do (log-info 'this (str "calling - > " ~fn-name)) ~body (identity 0)) ~error)))))
 
 

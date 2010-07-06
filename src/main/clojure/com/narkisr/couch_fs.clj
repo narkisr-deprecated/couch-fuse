@@ -40,8 +40,11 @@
 
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
   (if (and (not (attachment? (-> fh meta :node))) (contains? @write-cache path))
-    (do (update-file (-> fh meta :node) (String. (@write-cache path)))
-      (clear-cache path))))
+    (try
+      (update-file (-> fh meta :node) (String. (@write-cache path)))
+      (catch Exception e (log-warn this (. e getMessage)))
+      (finally (clear-cache path)); no point in keeping bad cache values
+      )))
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
 

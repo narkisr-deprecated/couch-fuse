@@ -43,5 +43,9 @@
     "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n"
     ))
 
-
+(deftest non-legal-json-with-recovery
+  (let [json #(-> (File. file-path) slurp* read-json)]
+    (spit (File. file-path) (json-str (assoc (json) "key" "value")))
+    (spit (File. file-path) "blabla") ; non legal json
+    (is (= ((json) "key") "value"))))
 
