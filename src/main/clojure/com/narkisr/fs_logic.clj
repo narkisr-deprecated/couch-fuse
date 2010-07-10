@@ -43,7 +43,7 @@
 (defn under-root? [path]
   (= (lookup (-> path (File.) (.getParent))) @root))
 
-(defn- update [path key value]
+(defn update [path key value]
   (dosync (ref-set root
     (if (= path "/") (assoc-in @root (list key) value)
       (assoc-in @root (concat (lookup-keys path) (list key)) value)))))

@@ -29,13 +29,16 @@
   (fn [] (-> (str *host* *db* "/" path) resourcefully/head (get-in [:headers :content-length]) first Integer/parseInt (- 1))))
 
 (defn update-document [id contents]
-  (couch document-update id (read-json contents)))
+  (couch document-update id contents))
 
 (defn create-document [id]
   (couch document-create id {}))
 
 (defn delete-document [id]
   (couch document-delete id))
+
+(defn get-document [id]
+  (couch document-get id))
 
 (defn couch-content [name]
   (fn [] (-> (str *host* *db* "/" name) resourcefully/get :body-seq first (. getBytes))))
@@ -48,5 +51,5 @@
     (catch java.io.IOException e nil)))
 
 (defn create-non-existing-db [name]
-    (when-not (db-exists? *host*  name)
-      (database-create *host* name)))
+  (when-not (db-exists? *host*  name)
+    (database-create *host* name)))

@@ -37,7 +37,6 @@ Build:
 	$ cd ..
 	$ git clone git://github.com/narkisr/couch-fuse.git
 	$ cd couch-fuse
-	$ curl -X PUT http://localhost:5984/playground # db used in testing
 	$ rake deb
 
 Next:

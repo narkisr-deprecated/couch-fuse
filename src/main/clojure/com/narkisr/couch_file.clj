@@ -1,6 +1,9 @@
 (ns com.narkisr.couch-file
   (:import java.io.File)
-  (:use com.narkisr.fs-logic com.narkisr.common-fs com.narkisr.couch-access))
+  (:use (com.narkisr fs-logic common-fs couch-access)
+        (couchdb (client :only [ResourceConflict]))
+        (clojure.contrib.json read )
+        (clojure.contrib error-kit )))
 
 (defn join-maps [& maps]
   (reduce merge maps))
@@ -11,9 +14,9 @@
 
 (defn- create-file-attachments [doc]
   (reduce (fn [res [file-name details]]
-    (assoc res file-name
-      (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true]
-        (couch-attachment-content doc file-name) #(details :length)))) {} (attachments doc)))
+            (assoc res file-name
+                   (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true]
+                                (couch-attachment-content doc file-name) #(details :length)))) {} (attachments doc)))
 
 (defn- create-document-folder [name]
   {name (create-node directory name 0755 [:description "A couch document folder"] (join-maps (create-file-entry name) (create-file-attachments name)))})
@@ -21,9 +24,20 @@
 (defn couch-files []
   (reduce merge (map #(create-document-folder %) (all-ids))))
 
-(defn update-file [file contents]
-  (let [attrs (apply hash-map (file :xattrs))]
-    (update-document (attrs :couch-id) contents)))
+(defn- update-rev-and-time [path rev-map]
+  (update path :_rev (rev-map :_rev))
+  (update-atime path (System/currentTimeMillis)))
+
+(defn- use-lastest-rev [path id contents]
+  (update-rev-and-time path 
+    (update-document id (assoc contents :_rev ((get-document id) :_rev)))))
+
+(defn update-file [path file contents-str]
+  (let [id ((apply hash-map (file :xattrs)) :couch-id) contents (read-json contents-str) ]
+    (with-handler 
+      (update-rev-and-time path (update-document id contents))
+      (handle ResourceConflict [msg]
+        (use-lastest-rev path id contents)))))
 
 (defn- fname [path]
   (-> path (File.) (.getName)))
