@@ -1,2 +1,6 @@
 target/
 imls/
+couch-fuse.iml
+couch-fuse.ipr
+couch-fuse.iws
+couchfuse

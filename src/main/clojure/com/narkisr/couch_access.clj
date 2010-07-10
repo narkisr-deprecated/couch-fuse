@@ -4,7 +4,7 @@
   (:require [clojure.http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [document-list document-get document-update document-delete document-create view-get attachment-get attachment-list]))
+    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
     (clojure.contrib.json read write)))
 
@@ -47,3 +47,6 @@
   (try (resourcefully/get (str host db))
     (catch java.io.IOException e nil)))
 
+(defn create-non-existing-db [name]
+    (when-not (db-exists? *host*  name)
+      (database-create *host* name)))
