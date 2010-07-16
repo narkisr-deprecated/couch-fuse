@@ -4,7 +4,7 @@
   (:require [clojure.http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list]))
+    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
     (clojure.contrib.json read write)))
 
@@ -23,6 +23,9 @@
 
 (defn attachments [name]
   (couch attachment-list name))
+
+(defn add-attachment [id name contents mimetype]
+  (couch attachment-create id name contents mimetype))
 
 (defn couch-size [path]
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."
@@ -51,5 +54,5 @@
     (catch java.io.IOException e nil)))
 
 (defn create-non-existing-db [name]
-  (when-not (db-exists? *host*  name)
+  (when-not (db-exists? *host* name)
     (database-create *host* name)))

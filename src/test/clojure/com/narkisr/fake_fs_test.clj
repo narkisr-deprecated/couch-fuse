@@ -7,5 +7,4 @@
 
 (deftest getdir-error
   (is (= 0 (fs-getdir "this" "/" (mock fuse.FuseDirFiller))))
-  (is (= Errno/ENOTDIR (fs-getdir "this" "/README" (mock fuse.FuseDirFiller))))
-  )
+  (is (= Errno/ENOTDIR (fs-getdir "this" "/README" (mock fuse.FuseDirFiller)))))

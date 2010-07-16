@@ -1,9 +1,9 @@
 (ns com.narkisr.couch-file
   (:import java.io.File)
   (:use (com.narkisr fs-logic common-fs couch-access)
-        (couchdb (client :only [ResourceConflict]))
-        (clojure.contrib.json read )
-        (clojure.contrib error-kit )))
+    (couchdb (client :only [ResourceConflict]))
+    (clojure.contrib.json read)
+    (clojure.contrib error-kit)))
 
 (defn join-maps [& maps]
   (reduce merge maps))
@@ -12,11 +12,12 @@
   (let [file-name (str name ".json")]
     {file-name (create-node file file-name 0644 [:description "A couch document json" :mimetype "application/json" :couch-id name] (couch-content name) (couch-size name))}))
 
+(defn- create-attachment [doc file-name details]
+  (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true]
+    (couch-attachment-content doc file-name) #(details :length)))
+
 (defn- create-file-attachments [doc]
-  (reduce (fn [res [file-name details]]
-            (assoc res file-name
-                   (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true]
-                                (couch-attachment-content doc file-name) #(details :length)))) {} (attachments doc)))
+  (reduce (fn [res [file-name details]] (assoc res file-name (create-attachment doc file-name details))) {} (attachments doc)))
 
 (defn- create-document-folder [name]
   {name (create-node directory name 0755 [:description "A couch document folder"] (join-maps (create-file-entry name) (create-file-attachments name)))})
@@ -29,18 +30,21 @@
   (update-atime path (System/currentTimeMillis)))
 
 (defn- use-lastest-rev [path id contents]
-  (update-rev-and-time path 
+  (update-rev-and-time path
     (update-document id (assoc contents :_rev ((get-document id) :_rev)))))
 
 (defn update-file [path file contents-str]
-  (let [id ((apply hash-map (file :xattrs)) :couch-id) contents (read-json contents-str) ]
-    (with-handler 
+  (let [id ((apply hash-map (file :xattrs)) :couch-id) contents (read-json contents-str)]
+    (with-handler
       (update-rev-and-time path (update-document id contents))
       (handle ResourceConflict [msg]
         (use-lastest-rev path id contents)))))
 
-(defn- fname [path]
-  (-> path (File.) (.getName)))
+(defn- fname [path] (-> path (File.) (.getName)))
+
+(defn- parent-name [path] (-> path (File.) (.getParentFile) (.getName)))
+
+(defn- file-path [file] (-> file (File.) (.getPath)))
 
 (defn delete-folder [path]
   (delete-document (fname path))
@@ -50,6 +54,11 @@
   (let [name (fname path)]
     (create-document name)
     (add-file path ((create-document-folder name) name))))
+
+(defn create-file [path mode]
+  (let [id (parent-name path) name (fname path)]
+    (add-attachment id name "" "text/plain")
+    (add-file (file-path path) (create-attachment id name {:content_type "" :length 0}) )))
 
 (defn fetch-content
   ([file] (-> file :content (apply [])))

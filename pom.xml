@@ -44,6 +44,11 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>circumspec</groupId>
+            <artifactId>circumspec</artifactId>
+            <version>0.0.13</version>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.15</version>

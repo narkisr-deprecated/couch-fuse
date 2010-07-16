@@ -43,7 +43,7 @@
     (try
       (update-file path (-> fh meta :node) (String. (@write-cache path)))
       (catch Exception e (log-warn this (str (. e getMessage) (class e))))
-      (finally (clear-cache path)); no point in keeping bad cache values
+      (finally (clear-cache path)) ; no point in keeping bad cache values
       )))
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
@@ -56,10 +56,8 @@
     (update-cache path b)
     total-written))
 
-(def-fs-fn mknod [path mode rdev] Errno/EPERM
-  ; I should consider how to add a node, since node name = couch id which I don't control nor do wish to
-  ;  (add-file path mode)
-  )
+(def-fs-fn mknod [path mode rdev] 
+  (create-file path mode))
 
 (def-fs-fn mkdir [path mode] (under-root? path) Errno/EPERM
   (create-folder path mode))
