@@ -1,5 +1,5 @@
 (ns com.narkisr.fake-fs
-  (:use com.narkisr.mocking com.narkisr.fs-logic com.narkisr.common-fs)
+  (:use com.narkisr.fs-logic com.narkisr.common-fs)
   (:import fuse.FuseFtypeConstants fuse.Errno))
 
 

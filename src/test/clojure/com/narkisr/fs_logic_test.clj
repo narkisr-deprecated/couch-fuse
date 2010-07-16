@@ -1,5 +1,5 @@
 (ns com.narkisr.fs-logic-test
-  (:use clojure.contrib.test-is com.narkisr.fs-logic com.narkisr.mocking))
+  (:use clojure.contrib.test-is com.narkisr.fs-logic))
 
 (defn init [f]
   (dosync (ref-set root (create-node directory "" 0755 [:description "Root directory"]
@@ -24,9 +24,4 @@
 (deftest node-deletion
   (remove-file "/bla.txt")
   (is (nil? (lookup "/bla.txt"))))
-
-;(lookup-keys (rest (partition "/1077214558877334645/ae70b718342bc0d140743709e21cdbe6.jpeg" #"/")))
-;(lookup-keys (rest (partition "/1077214558877334645" #"/")))
-;(lookup-keys (rest (partition "/1077214558877334645/" #"/")))
-;(lookup-keys (rest (partition "/" #"/")))
 
