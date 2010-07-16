@@ -4,3 +4,10 @@ couch-fuse.iml
 couch-fuse.ipr
 couch-fuse.iws
 couchfuse
+*.swp
+sandbox
+fake
+native
+nohup.out
+pkg
+*.jar

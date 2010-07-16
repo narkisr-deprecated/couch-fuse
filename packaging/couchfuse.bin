@@ -1,0 +1,9 @@
+#!/bin/sh
+<%=launch%> -run-valid true 
+exitValue=$? 
+if [ $exitValue != 0 ] 
+then 
+exit $exitValue 
+fi 
+nohup <%=launch%>  >/dev/null 2>/dev/null &
+

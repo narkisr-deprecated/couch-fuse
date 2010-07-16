@@ -1,5 +1,7 @@
 require 'rake/packagetask'
 require 'rexml/document'
+require 'erb'
+
 
 pom = REXML::Document.new File.new("pom.xml")
 name =  pom.elements["project"].elements["name"].text
@@ -23,17 +25,10 @@ file 'couchfuse' do
 	server_path = (`uname -a`.include?("i686") && "i386") || "amd64"
 	path = "/usr/lib/jvm/java-6-sun/jre/lib/#{server_path}/server"
 	launch = "java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} '#{name_ver} filesystem' $@"
-	script = <<-eos
-	 #!/bin/sh
-	#{launch} -run-valid true 
-	 exitValue=$? 
-	 if [ $exitValue != 0 ] 
-	 then 
-	  exit $exitValue 
-	 fi 
-	 nohup #{launch}  &
-	eos
-	File.open('couchfuse', 'w') do |f|  f.puts script end       
+	script = "" 
+	File.open('packaging/couchfuse.bin' , 'r') { |f| script = f.read }
+	template = ERB.new(script)
+	File.open('couchfuse' , 'w') do |f|  f.puts template.result(binding) end       
 end
 
 file 'native/javafs','native/libjavafs.so' => :fusebuild do
@@ -54,7 +49,7 @@ task :fusebuild do
 end
 
 task :clean  do
-	([jar] +%w( pkg javafs native)).each {|f| rm_r f if File.exists? f}
+	([jar] + %w( pkg javafs native couchfuse)).each {|f| rm_r f if File.exists? f}
 	sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
 	sh 'mvn clean'
 end
