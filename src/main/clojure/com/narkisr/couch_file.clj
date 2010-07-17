@@ -1,6 +1,6 @@
 (ns com.narkisr.couch-file
   (:import java.io.File)
-  (:use (com.narkisr fs-logic common-fs couch-access)
+  (:use (com.narkisr fs-logic common-fs couch-access file-info predicates)
     (couchdb (client :only [ResourceConflict]))
     (clojure.contrib.json read)
     (clojure.contrib error-kit)))
@@ -13,7 +13,7 @@
     {file-name (create-node file file-name 0644 [:description "A couch document json" :mimetype "application/json" :couch-id name] (couch-content name) (couch-size name))}))
 
 (defn- create-attachment [doc file-name details]
-  (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true]
+  (create-node file file-name 0644 [:description "A couch document attachment" :mimetype (details :content_type) :attachment true :couch-id doc]
     (couch-attachment-content doc file-name) #(details :length)))
 
 (defn- create-file-attachments [doc]
@@ -34,17 +34,13 @@
     (update-document id (assoc contents :_rev ((get-document id) :_rev)))))
 
 (defn update-file [path file contents-str]
-  (let [id ((apply hash-map (file :xattrs)) :couch-id) contents (read-json contents-str)]
+  (let [id ((apply hash-map (file :xattrs)) :couch-id)]
     (with-handler
-      (update-rev-and-time path (update-document id contents))
-      (handle ResourceConflict [msg]
-        (use-lastest-rev path id contents)))))
-
-(defn- fname [path] (-> path (File.) (.getName)))
-
-(defn- parent-name [path] (-> path (File.) (.getParentFile) (.getName)))
-
-(defn- file-path [file] (-> file (File.) (.getPath)))
+      (if (attachment? file) 
+        (add-attachment id (file :name) contents-str "text/plain")
+        (update-rev-and-time path (update-document id (read-json contents-str))))
+      (handle ResourceConflict [msg] 
+              (use-lastest-rev path id (read-json contents-str))))))
 
 (defn delete-folder [path]
   (delete-document (fname path))
@@ -56,6 +52,7 @@
     (add-file path ((create-document-folder name) name))))
 
 (defn create-file [path mode]
+  "Adds an attachment only in memory"
   (let [id (parent-name path) name (fname path)]
     (add-attachment id name "" "text/plain")
     (add-file (file-path path) (create-attachment id name {:content_type "" :length 0}) )))
@@ -67,4 +64,4 @@
 (defn fetch-size
   ([file] (-> file :size (apply []))))
 
-(defn attachment? [node] (node :attachment))
+

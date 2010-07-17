@@ -23,4 +23,4 @@
 
 #_(deftest add-attachment
   (spit (File. file-path) "<html>hello world</html>")
-  #_(is (= (-> (File. file-path) slurp*) "<html>hello world</html>")))
+  (is (= (-> (File. file-path) slurp*) "<html>hello world</html>")))

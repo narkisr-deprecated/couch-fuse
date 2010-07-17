@@ -1,5 +1,5 @@
 (ns com.narkisr.couch-fs
-  (:use (com.narkisr fs-logic common-fs couch-file write-cache))
+  (:use (com.narkisr fs-logic common-fs couch-file write-cache predicates))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
@@ -39,7 +39,7 @@
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
-  (if (and (not (attachment? (-> fh meta :node))) (contains? @write-cache path))
+  (if (contains? @write-cache path)
     (try
       (update-file path (-> fh meta :node) (String. (@write-cache path)))
       (catch Exception e (log-warn this (str (. e getMessage) (class e))))
