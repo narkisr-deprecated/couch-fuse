@@ -24,6 +24,8 @@
 
 (defn filehandle? [node] (= (type node) :filehandle))
 
+(defn xattr-map [file]  (apply hash-map (file :xattrs)))
+
 (defn split-path [path] (rest (partition path #"/")))
 
 (defn- path-match-to-keys [path]

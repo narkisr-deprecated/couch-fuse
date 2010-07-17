@@ -1,5 +1,5 @@
 (ns com.narkisr.couch-fs
-  (:use (com.narkisr fs-logic common-fs couch-file write-cache predicates))
+  (:use (com.narkisr fs-logic common-fs couch-file write-cache))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
@@ -51,7 +51,7 @@
 (def-fs-fn truncate [path size])
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
-  (let [b (byte-array 256) total-written (min (. buf remaining) (- (alength b) offset))]
+  (let [total-written (min (. buf remaining) (- 256 offset)) b (byte-array total-written)]
     (. buf get b offset total-written)
     (update-cache path b)
     total-written))

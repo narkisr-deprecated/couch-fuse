@@ -29,5 +29,4 @@ export CLASSPATH
 
 #java -Djava.library.path=$LD_LIBRARY_PATH -Xdebug -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n fuse.FakeFilesystem $MOUNT_POINT -f
 BREAK_CHARS="(){}[],^%$#@\"\";:''|\\"
-rlwrap --remember -c -b $BREAK_CHARS -f $HOME/.clojure/repl/.clj_completions.1.1 \
-mvn clojure:repl -Djava.library.path=$LD_LIBRARY_PATH -o
+rlwrap --remember -c -b $BREAK_CHARS -f $HOME/.clojure/repl/.clj_completions.1.1 mvn clojure:repl -Djava.library.path=$LD_LIBRARY_PATH -o

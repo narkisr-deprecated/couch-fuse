@@ -32,3 +32,5 @@
     [[run-valid? "runs validation only" false] [host "Couchdb host name" "http://127.0.0.1:5984/"]
      [db "Couchdb db name"] [path "Mount path on local filesystem"] remaining]
     (if run-valid? (validate host db path) (mount host db path))))
+
+#_(mount-with-group "http://127.0.0.1:5984/" "snippets" "fake" "group")

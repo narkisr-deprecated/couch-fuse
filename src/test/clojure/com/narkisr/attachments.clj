@@ -21,6 +21,6 @@
 ; these tests actually mount a live couchdb therefor they require one up
 (use-fixtures :once mount-and-sleep)
 
-#_(deftest add-attachment
+(deftest add-attachment
   (spit (File. file-path) "<html>hello world</html>")
   (is (= (-> (File. file-path) slurp*) "<html>hello world</html>")))

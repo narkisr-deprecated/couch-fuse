@@ -1,6 +1,6 @@
 (ns com.narkisr.couch-file
   (:import java.io.File)
-  (:use (com.narkisr fs-logic common-fs couch-access file-info predicates)
+  (:use (com.narkisr fs-logic common-fs couch-access file-info)
     (couchdb (client :only [ResourceConflict]))
     (clojure.contrib.json read)
     (clojure.contrib error-kit)))
@@ -33,14 +33,19 @@
   (update-rev-and-time path
     (update-document id (assoc contents :_rev ((get-document id) :_rev)))))
 
+(defn- update-attachment [path couch-id file-name contents ]
+  (add-attachment couch-id file-name contents "text/plain")
+  (update path :content  (couch-attachment-content couch-id file-name))
+  (update path :size  #(. contents length)))
+
 (defn update-file [path file contents-str]
-  (let [id ((apply hash-map (file :xattrs)) :couch-id)]
+  (let [{:keys [couch-id attachment]} (xattr-map file)]
     (with-handler
-      (if (attachment? file) 
-        (add-attachment id (file :name) contents-str "text/plain")
-        (update-rev-and-time path (update-document id (read-json contents-str))))
+      (if attachment 
+        (update-attachment path couch-id (file :name) contents-str)
+        (update-rev-and-time path (update-document couch-id (read-json contents-str))))
       (handle ResourceConflict [msg] 
-              (use-lastest-rev path id (read-json contents-str))))))
+              (use-lastest-rev path couch-id (read-json contents-str))))))
 
 (defn delete-folder [path]
   (delete-document (fname path))
