@@ -18,6 +18,9 @@
   `(with-type ~(clojure.lang.Keyword/intern type)
     (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
+(defn with-xattr [xattrs node]
+  (assoc node :xattrs (apply conj (node :xattrs) xattrs)))
+
 (def root (ref {})) ; must be binded when used to the actual root
 
 (defn directory? [node] (= (type node) :directory))
