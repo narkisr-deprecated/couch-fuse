@@ -1,6 +1,6 @@
 (ns com.narkisr.couchfs.couch-fs
   (:use (com.narkisr.couchfs couch-file write-cache) 
-        (com.narkisr fs-logic common-fs ))
+        (com.narkisr fs-logic common-fs))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
@@ -71,15 +71,17 @@
 
 (def-fs-fn fsync [path fh isDatasync])
 
-(def-fs-fn unlink [path])
+(def-fs-fn unlink [path] 
+  (if ((lookup path) :attachment)
+    (delete-file path)))
 
 (def-fs-fn chown [path uid gid])
 
 (def-fs-fn rename [from to])
 
 (def-fs-fn rmdir [path] (under-root? path) Errno/EPERM
-  (delete-folder path))
+           (delete-folder path))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
-  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
+           (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))

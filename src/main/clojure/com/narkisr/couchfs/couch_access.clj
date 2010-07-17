@@ -4,7 +4,7 @@
   (:require [clojure.http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create]))
+    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
     (clojure.contrib.json read write)))
 
@@ -26,6 +26,9 @@
 
 (defn add-attachment [id name contents mimetype]
   (couch attachment-create id name contents mimetype))
+
+(defn delete-attachment [id name]
+  (couch attachment-delete id name ))
 
 (defn couch-size [path]
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."

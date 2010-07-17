@@ -53,6 +53,12 @@
     (add-attachment couch-id attach-id "" "text/plain")
     (add-file (file-path path) (create-attachment couch-id attach-id {:content_type "" :length 0}) )))
 
+(defn delete-file [path]
+  "Deletes an attachment"
+  (let [couch-id (parent-name path) attach-id (fname path)]
+    (delete-attachment couch-id attach-id )
+    (remove-file path)))
+
 (defn fetch-content
   ([file] (-> file :content (apply [])))
   ([file f] (-> file :content (apply []) f)))

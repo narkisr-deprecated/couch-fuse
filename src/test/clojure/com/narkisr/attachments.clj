@@ -24,3 +24,7 @@
 (deftest add-attachment
   (spit (File. file-path) "<html>hello world</html>")
   (is (= (-> (File. file-path) slurp*) "<html>hello world</html>")))
+
+(deftest delete-attachment
+  (sh "rm" file-path)
+  (is (not (-> file-path (File.) (.exists)))))

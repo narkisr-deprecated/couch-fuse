@@ -84,7 +84,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.narkisr.mounter</mainClass>
+                            <mainClass>com.narkisr.couchfs.mounter</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
