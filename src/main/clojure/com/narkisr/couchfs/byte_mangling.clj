@@ -1,4 +1,4 @@
-(ns com.narkisr.byte-mangling
+(ns com.narkisr.couchfs.byte-mangling
   (:import java.util.Arrays)
   )
 

@@ -1,7 +1,7 @@
 (ns com.narkisr.attachments
   (:import java.io.File)
   (:use
-    (com.narkisr (mounter :only [mount-with-group]) (couch-access :only [create-non-existing-db]))
+    (com.narkisr.couchfs (mounter :only [mount-with-group]) (couch-access :only [create-non-existing-db]))
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
 

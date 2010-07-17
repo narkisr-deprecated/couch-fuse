@@ -1,7 +1,9 @@
-(ns com.narkisr.mounter
+(ns com.narkisr.couchfs.mounter
   (:gen-class)
   (:import fuse.FuseMount org.apache.commons.logging.LogFactory java.io.File)
-  (:use com.narkisr.couch-fs com.narkisr.couch-access clojure.contrib.command-line))
+  (:use 
+     (com.narkisr.couchfs couch-fs couch-access) 
+     clojure.contrib.command-line))
 
 (defn valid? [cond message]
   (if (cond) (do (println message) (System/exit 1))))
@@ -13,7 +15,7 @@
     (valid? cond error)))
 
 
-(defn- creat-log [] (LogFactory/getLog (class com.narkisr.mounter)))
+(defn- creat-log [] (LogFactory/getLog (class com.narkisr.couchfs.mounter)))
 
 (defn mount [host db path]
   (alter-var-root #'*host* (fn [_] (identity host)))

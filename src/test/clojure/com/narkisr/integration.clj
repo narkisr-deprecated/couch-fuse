@@ -2,8 +2,8 @@
   (:import java.io.File)
   (:use
     (clojure.contrib.json read write)
-    (com.narkisr (mounter :only [mount-with-group]) fs-logic
-      (couch-access :only [create-non-existing-db update-document get-document]))
+    (com.narkisr.couchfs (mounter :only [mount-with-group]) (couch-access :only [create-non-existing-db update-document get-document]))
+    (com.narkisr fs-logic)
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
 (def file-path)

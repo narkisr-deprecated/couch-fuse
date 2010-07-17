@@ -1,6 +1,8 @@
-(ns com.narkisr.couch-file
+(ns com.narkisr.couchfs.couch-file
   (:import java.io.File)
-  (:use (com.narkisr fs-logic common-fs couch-access file-info)
+  (:use 
+    (com.narkisr.couchfs couch-access)
+    (com.narkisr fs-logic common-fs file-info)
     (couchdb (client :only [ResourceConflict]))
     (clojure.contrib.json read)
     (clojure.contrib error-kit)))

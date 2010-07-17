@@ -1,5 +1,6 @@
-(ns com.narkisr.couch-fs
-  (:use (com.narkisr fs-logic common-fs couch-file write-cache))
+(ns com.narkisr.couchfs.couch-fs
+  (:use (com.narkisr.couchfs couch-file write-cache) 
+        (com.narkisr fs-logic common-fs ))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []

@@ -1,4 +1,4 @@
-(ns com.narkisr.couch-access
+(ns com.narkisr.couchfs.couch-access
   (:import (java.net URL))
   (:refer-clojure :exclude [contains?])
   (:require [clojure.http.resourcefully :as resourcefully])
