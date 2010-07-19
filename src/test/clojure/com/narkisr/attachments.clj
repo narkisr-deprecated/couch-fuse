@@ -9,6 +9,7 @@
 (defn mount-and-sleep [f]
   (def uuid (java.util.UUID/randomUUID))
   (def file-path (str "fake/" uuid "/" uuid ".html"))
+  (def rename-path (str "fake/" uuid "/" uuid "renamed.html"))
   (create-non-existing-db "playground")
   (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
   (java.lang.Thread/sleep 2000)
@@ -28,3 +29,9 @@
 (deftest delete-attachment
   (sh "rm" file-path)
   (is (not (-> file-path (File.) (.exists)))))
+
+(deftest rename
+  (spit (File. file-path) "<html>hello world</html>")
+  (sh "mv" file-path rename-path)
+  (is (= (-> (File. rename-path) slurp*) "<html>hello world</html>")))
+

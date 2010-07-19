@@ -54,9 +54,9 @@
     (add-file (file-path path) (create-attachment couch-id attach-id {:content_type "" :length 0}) )))
 
 (defn delete-file [path]
-  "Deletes an attachment"
+  "Deletes only attachments"
   (let [couch-id (parent-name path) attach-id (fname path)]
-    (delete-attachment couch-id attach-id )
+    (delete-attachment couch-id attach-id)
     (remove-file path)))
 
 (defn fetch-content
@@ -66,4 +66,9 @@
 (defn fetch-size
   ([file] (-> file :size (apply []))))
 
-
+(defn rename-file [from to]
+  "This expensive, couch does not have a rename built in https://issues.apache.org/jira/browse/COUCHDB-715"
+  (let [content (String. (fetch-content (lookup from)))]
+    (delete-file from)
+    (create-file to 0644)
+    (update-file to (lookup to) content)))

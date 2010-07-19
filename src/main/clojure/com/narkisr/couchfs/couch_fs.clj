@@ -69,19 +69,23 @@
 (def-fs-fn chmod [path mode]
   (update-mode path mode))
 
-(def-fs-fn fsync [path fh isDatasync])
+(def-fs-fn fsync [path fh isDatasync]
+  (log-warn "" "fsync not impl"))
+
 
 (def-fs-fn unlink [path] 
-  (if ((lookup path) :attachment)
+  (if (-> (lookup path) xattr-map :attachment)
     (delete-file path)))
 
-(def-fs-fn chown [path uid gid])
+(def-fs-fn chown [path uid gid]
+  (log-warn "" "chwon not impl"))
 
-(def-fs-fn rename [from to])
+(def-fs-fn rename [from to]
+  (rename-file from to))
 
 (def-fs-fn rmdir [path] (under-root? path) Errno/EPERM
-           (delete-folder path))
+  (delete-folder path))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
-           (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
+  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
