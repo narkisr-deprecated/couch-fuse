@@ -52,8 +52,8 @@
 (def-fs-fn truncate [path size])
 
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
-  (let [total-written (min (. buf remaining) (- 256 offset)) b (byte-array total-written)]
-    (. buf get b offset total-written)
+  (let [total-written (min (. buf remaining) 256) b (byte-array total-written)]
+    (. buf get b 0 total-written)
     (update-cache path b)
     total-written))
 
