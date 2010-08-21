@@ -11,13 +11,21 @@ jar = "#{name_ver}-jar-with-dependencies.jar"
 tar = "#{name_ver}.tar.gz"
 fuse4j = '../fuse4j/native/'
 
+def mvn_with_ld(goal)
+	ENV["LD_LIBRARY_PATH"]="/usr/lib:#{ENV['JAVA_HOME']}/jre/lib/i386/server:#{pwd}/../fuse4j/native"
+	sh "mvn #{goal} -o"
+end
+
+task :mvnassembly => :fusebuild do
+end
+
 task :default => [:package]
 
 file jar => 'native/javafs' do
 	sh 'sudo touch /var/log/couchfuse.log'
 	sh 'sudo chmod 666 /var/log/couchfuse.log'
 	mkdir 'fake' unless File.exists? 'fake'
-	sh './mvn-with-ld.sh assembly:assembly' unless File.exists? "target/#{jar}"
+	mvn_with_ld('assembly:assembly') unless File.exists? "target/#{jar}"
 	cp "target/#{jar}" , pwd
 end 
 
@@ -70,4 +78,3 @@ task :sandbox => [:package] do
 	rm "../#{name}_#{version}.orig.tar.gz"
 	Dir['debian/*.ex'].each {|fn| rm fn rescue nil}
 end
-
