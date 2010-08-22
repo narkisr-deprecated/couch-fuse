@@ -4,7 +4,7 @@
     <groupId>com.narkisr</groupId>
     <artifactId>couch-fuse</artifactId>
     <packaging>jar</packaging>
-    <version>0.2</version>
+    <version>0.3</version>
     <name>couch-fuse</name>
     <url>http://maven.apache.org</url>
     <dependencies>

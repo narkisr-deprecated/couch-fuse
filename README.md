@@ -3,8 +3,8 @@ This comes handy for backup, editing and any other task that it easy to accompli
 
 In order to install:
 
-	$ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.2-1_i386.deb
-	$ sudo dpkg -i couch-fuse_0.2-1_i386.deb
+	$ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.3-1_amd64.deb
+	$ sudo dpkg -i couch-fuse_0.3-1_amd64.deb
 	# if java and fuse-utils are not installed already
 	$ sudo apt -f install
 
@@ -21,12 +21,14 @@ Usage:
 	# exising attachmens show up under the document folder
 	$ ls mount_path/foo/
 	foo.json  80x15.png  another.jpeg
-        
+        # create an attachment
+        $ touch mount_path/foo/bla.txt
+        # edit its content
+        $ vim mount_path/foo/bla.txt
 
 Known issues:
 
- * Attachments cannot be added via the FS (see next).
- * Attachments will show up under the document folder (read only mode), attachments loaded via Futon will show up only after re-mounting.
+ * Accessing attachment via nautilus zero out file content (this issue will be resolved on the next version).
        
 Build: 
 	# on ubuntu 10.04 64 and 32 bit 
@@ -41,5 +43,4 @@ Build:
 
 Next:
 
-* Document views, ability to define how a document should be viewed (edited?) in the FS.
-* Attachment uploading, copying attachments into a document folder will upload them.
+ * FS hooks (post update hook in order to re-build couchdb views).
