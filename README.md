@@ -21,10 +21,10 @@ Usage:
 	# exising attachmens show up under the document folder
 	$ ls mount_path/foo/
 	foo.json  80x15.png  another.jpeg
-        # create an attachment
-        $ touch mount_path/foo/bla.txt
-        # edit its content
-        $ vim mount_path/foo/bla.txt
+	# create an attachment
+	$ touch mount_path/foo/bla.txt
+	# edit its content
+	$ vim mount_path/foo/bla.txt
 
 Known issues:
 
