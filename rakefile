@@ -20,7 +20,8 @@ def mvn_with_ld(goal)
 	sh "mvn #{goal} -o"
 end
 
-task :mvnassembly => :fusebuild do
+task :mvnci => :fusebuild do
+	mvn_with_ld 'clean install'
 end
 
 task :default => [:package]

@@ -1,8 +1,8 @@
 (ns com.narkisr.fs-logic
-  (:refer-clojure :exclude [partition])
   (:import java.io.File)
-  (:use (clojure.contrib (def :only [defmacro-]) (str-utils2 :only [partition]))
-    pattern-match))
+  (:use (clojure.contrib (def :only [defmacro-])) 
+        (com.narkisr (file-info :only [split-path]))
+         pattern-match))
 
 (defn with-type [type x]
   (with-meta x {:type type}))
@@ -29,8 +29,6 @@
 
 (defn xattr-map [file]  (apply hash-map (file :xattrs)))
 
-(defn split-path [path] (rest (partition path #"/")))
-
 (defn- path-match-to-keys [path]
   (match path
     ["/" dir "/" file] (list :files dir :files file)
@@ -39,7 +37,7 @@
     ["/" file] (list :files file)))
 
 (defn lookup-keys [path]
-  (path-match-to-keys (split-path path)))
+  (path-match-to-keys (rest (split-path path))))
 
 (defn lookup [path]
   (if (= path "/") @root

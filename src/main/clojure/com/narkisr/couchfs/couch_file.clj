@@ -24,7 +24,10 @@
   (reduce (fn [res [file-name details]] (assoc res file-name (create-attachment couch-id file-name details))) {} (attachments couch-id)))
 
 (defn- create-document-folder [couch-id]
-  {couch-id (create-node directory couch-id 0755 [:description "A couch document folder"] (join-maps (create-file-entry couch-id) (create-file-attachments couch-id)))})
+  (let [hidden (str "." couch-id)]
+    (merge {hidden (create-node directory hidden 0444 [:description "Couch meta folder"] (create-file-entry couch-id))}
+           {couch-id (create-node directory couch-id 0755 [:description "Couch attachments folder"]  (create-file-attachments couch-id))})))
+
 
 (defn couch-files []
   (reduce merge (map #(create-document-folder %) (all-ids))))
@@ -43,9 +46,10 @@
   (remove-file path))
 
 (defn create-folder [path mode]
-  (let [couch-id (fname path)]
+  (let [couch-id (fname path) parent (parent-path path)]
     (create-document couch-id)
-    (add-file path ((create-document-folder couch-id) couch-id))))
+    (doseq [[k v] (create-document-folder couch-id)]
+      (add-file (combine parent k) v))))
 
 (defn create-file [path mode]
   "Adds an empty attachment to the given document path, update file will fill the missing data"
