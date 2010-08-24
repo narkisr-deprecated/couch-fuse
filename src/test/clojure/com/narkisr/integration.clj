@@ -35,12 +35,12 @@
     (is (= (contains? (slurp-json) "key") false))
     (is (= ((slurp-json) "_rev") ((get-document uuid) :_rev))))
 
-#_(deftest file-creation-should-fail
+(deftest file-creation-should-fail
   (let [temp (File. "fake/bla.txt")]
     (is (= (. temp exists) false))
     (is (thrown? java.io.FileNotFoundException (spit temp "{\"some\":value}")))))
 
-#_(deftest mkdir-only-on-root
+(deftest mkdir-only-on-root
   (do-template (do
     (is (= (-> _1 (File.) (.mkdir)) _2))
     (is (= (sh "rm" "-r" _1) _3)))
@@ -48,13 +48,13 @@
     "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n"
     ))
 
-#_(deftest non-legal-json-with-recovery
+(deftest non-legal-json-with-recovery
     (spit meta-file (json-str (assoc (slurp-json) "key" "value")))
     (spit meta-file "blabla") ; non legal json
     (is (= ((slurp-json) "_rev") ((get-document uuid) :_rev)))
     (is (= ((slurp-json) "key") "value")))
 
-#_(deftest update-conflict
+(deftest update-conflict
   "In this test we update a document value behind the scenes, still the fs value wins out in the conflict"
     (update-document uuid (assoc (slurp-json) "key" "value1"))
     (spit meta-file (json-str (assoc (slurp-json) "key" "value2")))
