@@ -40,6 +40,14 @@
     (is (= (. temp exists) false))
     (is (thrown? java.io.FileNotFoundException (spit temp "{\"some\":value}")))))
 
+(deftest meta-folder-deletion
+  (is (= (-> "fake/foo/" (File.) (.mkdir)) true))
+  (is (= (-> "fake/.foo/" (File.) (.exists)) true))
+  (is (= (-> "fake/foo/" (File.) (.delete)) true))
+  (sh "find"  "fake/.foo"); without this Java thinks that the file still exists (maybe some caching issue?)
+  (is (= (-> "fake/.foo/" (File.) (.exists)) false )))
+    
+
 (deftest mkdir-only-on-root
   (do-template (do
     (is (= (-> _1 (File.) (.mkdir)) _2))
