@@ -13,10 +13,11 @@
 
 (defn hidden [folder] (str (parent-path folder) "/." (fname folder)))
 
-(defn split-path [path] (partition path #"/"))
+(defn split-path [path] (rest (partition path #"/")))
 
 (defn to-hidden [path]
   (match (split-path path)
+    ["/" dir] (str "/." dir)
     ["/" dir "/" file] (str "/." dir "/" file)
     _ (str (hidden (parent-path path)) "/" (fname path))))
 

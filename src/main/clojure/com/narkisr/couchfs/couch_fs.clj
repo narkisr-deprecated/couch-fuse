@@ -84,7 +84,8 @@
   (rename-file from to))
 
 (def-fs-fn rmdir [path] (under-root? path) Errno/EPERM
-  (delete-folder path))
+  (if (not (-> (lookup path) xattr-map :meta-folder))
+   (delete-folder path)))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

@@ -37,7 +37,7 @@
     ["/" file] (list :files file)))
 
 (defn lookup-keys [path]
-  (path-match-to-keys (rest (split-path path))))
+  (path-match-to-keys (split-path path)))
 
 (defn lookup [path]
   (if (= path "/") @root

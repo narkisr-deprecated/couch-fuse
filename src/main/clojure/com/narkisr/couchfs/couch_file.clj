@@ -25,7 +25,8 @@
 
 (defn- create-document-folder [couch-id]
   (let [hidden (str "." couch-id)]
-    (merge {hidden (create-node directory hidden 0444 [:description "Couch meta folder"] (create-file-entry couch-id))}
+    (merge {hidden (with-xattr [:meta-folder true]
+                     (create-node directory hidden 0444 [:description "Couch meta folder"] (create-file-entry couch-id)))}
            {couch-id (create-node directory couch-id 0755 [:description "Couch attachments folder"]  (create-file-attachments couch-id))})))
 
 
@@ -43,7 +44,8 @@
 
 (defn delete-folder [path]
   (delete-document (fname path))
-  (remove-file path))
+  (remove-file path)
+  (remove-file (to-hidden path)))
 
 (defn create-folder [path mode]
   (let [couch-id (fname path) parent (parent-path path)]

@@ -12,7 +12,7 @@
 
 (defn mount-and-sleep [f]
   (def uuid (java.util.UUID/randomUUID))
-  (def meta-file (-> (str "fake/" uuid "/" uuid ".json") (to-hidden) ))
+  (def meta-file (-> (str "fake/." uuid "/" uuid ".json")))
   (create-non-existing-db "playground")
   (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
   (java.lang.Thread/sleep 2000)
