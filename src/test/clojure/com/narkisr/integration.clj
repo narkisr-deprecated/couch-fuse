@@ -15,7 +15,7 @@
   (def meta-file (-> (str "fake/." uuid "/" uuid ".json")))
   (create-non-existing-db "playground")
   (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
-  (java.lang.Thread/sleep 2000)
+  (java.lang.Thread/sleep 1000)
   (sh "mkdir" (str "fake/" uuid))
   (f)
   (sh "rm" "-r" (str "fake/" uuid))
@@ -44,7 +44,7 @@
   (is (= (-> "fake/foo/" (File.) (.mkdir)) true))
   (is (= (-> "fake/.foo/" (File.) (.exists)) true))
   (is (= (-> "fake/foo/" (File.) (.delete)) true))
-  (sh "find"  "fake/.foo"); without this Java thinks that the file still exists (maybe some caching issue?)
+  (java.lang.Thread/sleep 1000); deletion takes a bit
   (is (= (-> "fake/.foo/" (File.) (.exists)) false )))
     
 

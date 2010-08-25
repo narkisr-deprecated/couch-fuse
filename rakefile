@@ -20,7 +20,7 @@ def mvn_with_ld(goal)
 	sh "mvn #{goal} -o"
 end
 
-task :mvnci => :fusebuild do
+task :mvnci  do
 	mvn_with_ld 'clean install'
 end
 

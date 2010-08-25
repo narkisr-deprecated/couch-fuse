@@ -12,7 +12,7 @@
   (def rename-path (str "fake/" uuid "/" uuid "renamed.html"))
   (create-non-existing-db "playground")
   (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
-  (java.lang.Thread/sleep 2000)
+  (java.lang.Thread/sleep 1000)
   (sh "mkdir" (str "fake/" uuid))
   (f)
   (sh "rm" "-r" (str "fake/" uuid))
