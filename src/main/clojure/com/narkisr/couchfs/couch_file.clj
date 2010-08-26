@@ -43,9 +43,11 @@
               (use-lastest-rev path couch-id (read-json contents-str))))))
 
 (defn delete-folder [path]
-  (delete-document (fname path))
-  (remove-file path)
-  (remove-file (to-hidden path)))
+  (remove-file path))
+
+(defn delete-meta-folder [path]
+  (delete-document (-> path un-hide fname))
+  (remove-file path))
 
 (defn create-folder [path mode]
   (let [couch-id (fname path) parent (parent-path path)]

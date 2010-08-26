@@ -43,17 +43,19 @@
 (deftest meta-folder-deletion
   (is (= (-> "fake/foo/" (File.) (.mkdir)) true))
   (is (= (-> "fake/.foo/" (File.) (.exists)) true))
+  (is (= (-> "fake/.foo/" (File.) (.delete)) false))
   (is (= (-> "fake/foo/" (File.) (.delete)) true))
-  (java.lang.Thread/sleep 1000); deletion takes a bit
-  (is (= (-> "fake/.foo/" (File.) (.exists)) false )))
+  (is (= (-> "fake/.foo/" (File.) (.delete)) true)))
     
 
 (deftest mkdir-only-on-root
-  (do-template (do
-    (is (= (-> _1 (File.) (.mkdir)) _2))
-    (is (= (sh "rm" "-r" _1) _3)))
-    "fake/bla" true ""
-    "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n"
+  (do-template 
+    (do
+     (is (= (-> _1 (File.) (.mkdir)) _2))
+     (is (= (sh "rm" "-r" _1) _3))
+     (sh "rm" "-r" _4))
+     "fake/bla" true "" "fake/.bla"
+     "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n" ""
     ))
 
 (deftest non-legal-json-with-recovery

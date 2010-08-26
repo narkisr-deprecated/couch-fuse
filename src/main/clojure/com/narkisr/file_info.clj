@@ -13,13 +13,19 @@
 
 (defn hidden [folder] (str (parent-path folder) "/." (fname folder)))
 
+(defn un-hide [folder]
+  (let [parent (parent-path folder) name (. (fname folder) replaceFirst "\\." "")]
+    (if (= parent "/") 
+      (str "/" name)
+      (str  parent "/" name  ))))
+
 (defn split-path [path] (rest (partition path #"/")))
 
 (defn to-hidden [path]
   (match (split-path path)
-    ["/" dir] (str "/." dir)
-    ["/" dir "/" file] (str "/." dir "/" file)
-    _ (str (hidden (parent-path path)) "/" (fname path))))
+         ["/" dir] (str "/." dir)
+         ["/" dir "/" file] (str "/." dir "/" file)
+         _ (str (hidden (parent-path path)) "/" (fname path))))
 
 (defn combine [parent child]
   (if (= parent "/") 

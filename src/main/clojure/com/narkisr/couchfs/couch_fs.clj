@@ -1,6 +1,6 @@
 (ns com.narkisr.couchfs.couch-fs
-  (:use (com.narkisr.couchfs couch-file write-cache) 
-        (com.narkisr fs-logic common-fs))
+  (:use (com.narkisr.couchfs couch-file write-cache ) 
+        (com.narkisr fs-logic common-fs file-info))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (defn bind-root []
@@ -83,9 +83,10 @@
 (def-fs-fn rename [from to]
   (rename-file from to))
 
-(def-fs-fn rmdir [path] (under-root? path) Errno/EPERM
-  (if (not (-> (lookup path) xattr-map :meta-folder))
-   (delete-folder path)))
+(def-fs-fn rmdir [path] (and (under-root? path) (not (and (-> (lookup path) xattr-map :meta-folder) (lookup (un-hide path))))) Errno/EPERM
+    (if (-> (lookup path) xattr-map :meta-folder) 
+      (delete-meta-folder path)
+      (delete-folder path)))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
