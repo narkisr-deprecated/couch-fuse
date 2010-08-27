@@ -53,4 +53,3 @@
     (update-document uuid (assoc (slurp-json) "key" "value1"))
     (spit meta-file (json-str (assoc (slurp-json) "key" "value2")))
     (is (= ((slurp-json) "key") "value2")))
-
