@@ -2,25 +2,9 @@
   (:import java.io.File)
   (:use
     (clojure.contrib.json read write)
-    (com.narkisr.couchfs (mounter :only [mount-with-group]) 
-                         (couch-access :only [create-non-existing-db update-document get-document]))
-    (com.narkisr fs-logic (file-info :only [to-hidden]))
+    (com.narkisr.couchfs  (couch-access :only [update-document get-document]))
+    (com.narkisr fs-logic common-test)
     (clojure.contrib shell-out duck-streams test-is str-utils)))
-
-(def meta-file)
-(def uuid)
-
-(defn mount-and-sleep [f]
-  (def uuid (java.util.UUID/randomUUID))
-  (def meta-file (-> (str "fake/." uuid "/" uuid ".json")))
-  (create-non-existing-db "playground")
-  (mount-with-group "http://127.0.0.1:5984/" "playground" "fake" "fuse-threads")
-  (java.lang.Thread/sleep 1000)
-  (sh "mkdir" (str "fake/" uuid))
-  (f)
-  (sh "rm" "-r" (str "fake/" uuid))
-  (sh "fusermount" "-u" "fake")
-  )
 
 ; these tests actually mount a live couchdb therefor they require one up
 (use-fixtures :once mount-and-sleep)
@@ -69,3 +53,4 @@
     (update-document uuid (assoc (slurp-json) "key" "value1"))
     (spit meta-file (json-str (assoc (slurp-json) "key" "value2")))
     (is (= ((slurp-json) "key") "value2")))
+

@@ -1,12 +1,12 @@
 (ns com.narkisr.attachments
   (:import java.io.File)
   (:use
-    (com.narkisr.couchfs (mounter :only [mount-with-group]) (couch-access :only [create-non-existing-db]))
+    (com.narkisr common-test)
     (clojure.contrib shell-out duck-streams test-is str-utils)))
 
 
 
-(defn mount-and-sleep [f]
+#_(defn mount-and-sleep [f]
   (def uuid (java.util.UUID/randomUUID))
   (def file-path (str "fake/" uuid "/" uuid ".html"))
   (def rename-path (str "fake/" uuid "/" uuid "renamed.html"))
@@ -16,6 +16,7 @@
   (sh "mkdir" (str "fake/" uuid))
   (f)
   (sh "rm" "-r" (str "fake/" uuid))
+  (sh "rm" "-r" (str "fake/." uuid))
   (sh "fusermount" "-u" "fake")
   )
 
@@ -35,3 +36,12 @@
   (sh "mv" file-path rename-path)
   (is (= (-> (File. rename-path) slurp*) "<html>hello world</html>")))
 
+(deftest multiple-attachments
+   (let [names (range 0 20) target "fake/multi/" hidden "fake/.multi"]
+     (-> target (File.) (.mkdir))
+     (doseq [name names] 
+       (spit (str target name)  name))
+     (doseq [name names] 
+       (is (=  (-> (str target name) (File.) (.exists))  true)))
+     (-> target (File.) (.delete))
+     (-> hidden (File.) (.delete))))
