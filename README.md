@@ -1,4 +1,4 @@
-Couch-fuse its a Couchdb Fuse filesystem it enables a mount of a Couchdb databse into a local folder.
+Couch-fuse its a Couchdb Fuse filesystem it enables a mount of a Couchdb database into a local folder.
 This comes handy for backup, editing and any other task that it easy to accomplish via a filesystem interface, see this [demo](http://www.youtube.com/watch?v=ps3-CnqKVxU).
 
 In order to install:
@@ -11,24 +11,31 @@ In order to install:
 Usage:
 
 	$ couchfuse -db db_name -path mount_path
-	# each document is represented by folder, rsync cat and other utilites work:
-	$ cat mount_path/5195395990213004497/5195395990213004497.json
+	# in order to create a new doc
+	$ mkdir mount_path/foo
+	# each document is represented by two folders:
+	  * the first is the meta folder that contains the document json
+	  * the second contains attachments
+	$ find mount_path/
+	mount_path/.foo
+	mount_path/foo
+	# we can backup the db using rsync
 	$ rsync mount_path/ /some/backup/storage
-	# creating new documents is mkdir away, dir name is document id
-	$ mkdir foo
 	# documents are editable, you must keep the json valid or update will fail
-	$ vi mount_path/foo/foo.json
-	# exising attachmens show up under the document folder
-	$ ls mount_path/foo/
+	$ vi mount_path/.foo/foo.json
+	# exising attachmens show up under the attachment folder
+	$ ls mount_path/bar/
 	foo.json  80x15.png  another.jpeg
-	# create an attachment
-	$ touch mount_path/foo/bla.txt
-	# edit its content
+	# adding attchments is simple
 	$ vim mount_path/foo/bla.txt
+	# in order to delete a document both attahments and meta folder should be cleared, starting with the attahments
+	$ rm -r mount_path/.bar
+	rm: cannot remove directory `fake/.bla': Operation not permitted
+	$ rm -r mount_path/bar && rm -r mount_path/.bar
 
 Known issues:
 
- * Accessing attachment via nautilus zero out file content (this issue will be resolved on the next version).
+ * Nautilus write access to the FS is buggy, cli seems to be working find.
        
 Build: 
 	# on ubuntu 10.04 64 and 32 bit 
