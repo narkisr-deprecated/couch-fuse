@@ -34,7 +34,7 @@ Usage:
 
 Known issues:
 
- * Nautilus write access to the FS is buggy, cli seems to be working find.
+ * Nautilus write access to the FS is buggy, cli seems to be working fine.
        
 Build: 
 	# on ubuntu 10.04 64 and 32 bit 
