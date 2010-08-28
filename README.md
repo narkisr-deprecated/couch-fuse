@@ -41,7 +41,7 @@ Build:
 	$ sudo aptitude install dh-make libfuse-dev sun-java6-jdk maven2 ruby rake couchdb curl
 	$ git clone git://github.com/narkisr/fuse4j.git
 	$ cd fuse4j/maven
-	$ maven clean install
+	$ mvn clean install
 	$ cd ..
 	$ git clone git://github.com/narkisr/couch-fuse.git
 	$ cd couch-fuse
