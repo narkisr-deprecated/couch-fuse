@@ -3,8 +3,7 @@
      (com.narkisr.couchfs couch-access file-update)
      (com.narkisr fs-logic common-fs file-info)
      (couchdb (client :only [ResourceConflict]))
-     (clojure.contrib.json read)
-     (clojure.contrib error-kit)))
+     (clojure.contrib error-kit (json :only [read-json]))))
 
 (defn join-maps [& maps]
   (reduce merge maps))

@@ -17,7 +17,7 @@ end
 
 def mvn_with_ld(goal)
 	ENV["LD_LIBRARY_PATH"]="/usr/lib:#{ENV['JAVA_HOME']}/jre/lib/#{server_path}/server:#{pwd}/../fuse4j/native"
-	sh "mvn #{goal} -o"
+	sh "mvn #{goal}"
 end
 
 task :mvnci => :logfile  do

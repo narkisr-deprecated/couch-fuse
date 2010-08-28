@@ -2,7 +2,7 @@
   (:import java.io.File)
   (:use
     (com.narkisr common-test)
-    (clojure.contrib shell-out duck-streams test-is str-utils)))
+    (clojure.contrib shell-out (duck-streams :only [slurp*]) test-is str-utils)))
 
 
 

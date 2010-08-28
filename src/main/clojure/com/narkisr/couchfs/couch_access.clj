@@ -1,12 +1,11 @@
 (ns com.narkisr.couchfs.couch-access
   (:import (java.net URL))
   (:refer-clojure :exclude [contains?])
-  (:require [clojure.http.resourcefully :as resourcefully])
+  (:require [clojure-http.resourcefully :as resourcefully])
   (:use
     (com.narkisr fs-logic)
     (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete]))
-    (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) duck-streams)
-    (clojure.contrib.json read write)))
+    (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) (duck-streams :only [to-byte-array]))))
 
 (def *host* "http://127.0.0.1:5984/")
 (def *db* "blog-import")
