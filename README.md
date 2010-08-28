@@ -17,21 +17,20 @@ Usage:
 	  * the first is the meta folder that contains the document json
 	  * the second contains attachments
 	$ find mount_path/
-	mount_path/.foo
+	mount_path/.foo/foo.json
 	mount_path/foo
 	# we can backup the db using rsync
-	$ rsync mount_path/ /some/backup/storage
-	# documents are editable, you must keep the json valid or update will fail
+	$ rsync -auv mount_path/ /some/backup/storage
+	# document is editable, json must be kept valid
 	$ vi mount_path/.foo/foo.json
-	# exising attachmens show up under the attachment folder
-	$ ls mount_path/bar/
-	foo.json  80x15.png  another.jpeg
-	# adding attchments is simple
-	$ vim mount_path/foo/bla.txt
-	# in order to delete a document both attahments and meta folder should be cleared, starting with the attahments
-	$ rm -r mount_path/.bar
-	rm: cannot remove directory `fake/.bla': Operation not permitted
-	$ rm -r mount_path/bar && rm -r mount_path/.bar
+	# attachmens show up under the attachment folder
+	$ cp another.jpeg mount_path/foo && ls mount_path/foo
+	another.jpeg
+	# in order to delete a document both attahments and meta folder should be cleared, starting with attachments
+	$ rm -r mount_path/.foo
+	rm: cannot remove directory `fake/.foo': Operation not permitted
+	# this will work
+	$ rm -r mount_path/foo && rm -r mount_path/.foo
 
 Known issues:
 
