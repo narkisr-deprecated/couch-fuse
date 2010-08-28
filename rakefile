@@ -20,15 +20,18 @@ def mvn_with_ld(goal)
 	sh "mvn #{goal} -o"
 end
 
-task :mvnci  do
+task :mvnci => :logfile  do
 	mvn_with_ld 'clean install'
 end
 
 task :default => [:package]
 
-file jar => 'native/javafs' do
+task :logfile do
 	sh 'sudo touch /var/log/couchfuse.log'
 	sh 'sudo chmod 666 /var/log/couchfuse.log'
+end
+
+file jar => ['native/javafs',:logfile] do
 	mkdir 'fake' unless File.exists? 'fake'
 	mvn_with_ld('assembly:assembly') unless File.exists? "target/#{jar}"
 	cp "target/#{jar}" , pwd
