@@ -14,12 +14,17 @@
 (fstype Meta :file)
 (fstype File :content :size)
 
-(defprotocol Handle
-             (delete [this])
-             (create [this]))
+(defprotocol Crud
+  (delete [this])
+  (create [this])
+  (read [this]))
 
-(defprotocol FsElement
-             )
+(defprotocol FsMeta
+  (xattr [this])
+  (size [this]))
 
-(defprotocol FsContainer
-             )
+(extend-type Directory 
+  Crud
+   (delete [this])
+   (create [this])
+   (read [this]))

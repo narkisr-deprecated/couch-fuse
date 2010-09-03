@@ -2,8 +2,8 @@
   (:gen-class)
   (:import fuse.FuseMount org.apache.commons.logging.LogFactory java.io.File)
   (:use 
-     (com.narkisr.couchfs couch-fs couch-access) 
-     clojure.contrib.command-line))
+     (com.narkisr.couchfs couch-fs couch-access (initialization :only [init-fs-root]))
+     (clojure.contrib (command-line :only [with-command-line]))))
 
 (defn valid? [cond message]
   (if (cond) (do (println message) (System/exit 1))))
@@ -20,13 +20,13 @@
 (defn mount [host db path]
   (alter-var-root #'*host* (fn [_] (identity host)))
   (alter-var-root #'*db* (fn [_] (identity db)))
-  (bind-root)
+  (init-fs-root)
   (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (creat-log)))
 
 (defn mount-with-group [host db path group]
   (alter-var-root #'*host* (fn [_] (identity host)))
   (alter-var-root #'*db* (fn [_] (identity db)))
-  (bind-root)
+  (init-fs-root)
   (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (java.lang.ThreadGroup. group) (creat-log)))
 
 (defn -main [version & args]
@@ -34,5 +34,3 @@
     [[run-valid? "runs validation only" false] [host "Couchdb host name" "http://127.0.0.1:5984/"]
      [db "Couchdb db name"] [path "Mount path on local filesystem"] remaining]
     (if run-valid? (validate host db path) (mount host db path))))
-
-#_(mount-with-group "http://127.0.0.1:5984/" "snippets" "fake" "group")

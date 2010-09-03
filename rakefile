@@ -21,7 +21,7 @@ def mvn_with_ld(goal)
 end
 
 task :mvnci => :logfile  do
-	mvn_with_ld 'clean install'
+	mvn_with_ld 'clean install -o'
 end
 
 task :default => [:package]

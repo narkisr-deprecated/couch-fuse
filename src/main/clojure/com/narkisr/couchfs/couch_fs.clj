@@ -1,10 +1,8 @@
 (ns com.narkisr.couchfs.couch-fs
-  (:use (com.narkisr.couchfs couch-file write-cache ) 
+  (:require [com.narkisr.couchfs.write-cache :as cache])
+  (:use (com.narkisr.couchfs couch-file) 
         (com.narkisr fs-logic common-fs file-info))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
-
-(defn bind-root []
-  (dosync (ref-set root (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
 
 (def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
@@ -18,17 +16,16 @@
     (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
       (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))))
 
-
-(defn- apply-attr [setter node type length]
+(defn- apply-attr [setter node fuse-type length]
   (. setter set (. node hashCode)
-    (bit-or type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
+    (bit-or fuse-type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
 
 (def-fs-fn getattr [path setter] (some #{(type (lookup path))} [:directory :file :link]) Errno/ENOENT
-  (let [node (lookup path)]
-    (condp = (type node)
-      :directory (apply-attr setter node FuseFtypeConstants/TYPE_DIR (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idiom
-      :file (apply-attr setter node FuseFtypeConstants/TYPE_FILE (fetch-size node))
-      :link (apply-attr setter node FuseFtypeConstants/TYPE_SYMLINK (-> node :link (. size)))
+  (let [node (lookup path) ntype (type node)]
+    (condp = ntype
+      :directory (apply-attr setter node (type-to-const ntype) (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idiom
+      :file (apply-attr setter node (type-to-const ntype) (fetch-size node))
+      :link (apply-attr setter node (type-to-const ntype) (-> node :link (. size)))
       )))
 
 (def-fs-fn open [path flags openSetter]
@@ -40,11 +37,11 @@
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
-  (if (contains? @write-cache path)
+  (if (contains? @cache/write-cache path)
     (try
-      (update-file path (-> fh meta :node) (String. (@write-cache path)))
-      (catch Exception e (log-warn this (str (. e getMessage) (class e))))
-      (finally (clear-cache path)) ; no point in keeping bad cache values
+      (update-file path (-> fh meta :node) (String. (@cache/write-cache path)))
+     (catch Exception e (log-warn this (str (. e getMessage) (class e))))
+     (finally (cache/clear-cache path)) ; no point in keeping bad cache values
       )))
 
 (def-fs-fn release [path fh flags] (filehandle? fh) Errno/EBADF (System/runFinalization))
@@ -54,7 +51,7 @@
 (def-fs-fn write [path fh is-writepage buf offset] (filehandle? fh) Errno/EROFS
   (let [total-written (min (. buf remaining) 256) b (byte-array total-written)]
     (. buf get b 0 total-written)
-    (update-cache path b)
+    (cache/update-cache path b)
     total-written))
 
 (def-fs-fn mknod [path mode rdev] 
@@ -71,7 +68,6 @@
 
 (def-fs-fn fsync [path fh isDatasync]
   (log-warn "" "fsync not impl"))
-
 
 (def-fs-fn unlink [path] 
   (if (-> (lookup path) xattr-map :attachment)
