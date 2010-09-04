@@ -1,32 +1,27 @@
 (ns com.narkisr.couchfs.couch-fs
   (:require [com.narkisr.couchfs.write-cache :as cache]
-            [com.narkisr.couchfs.couch-file :as couch-file])
+            [com.narkisr.couchfs.couch-file :as couch-file]
+            [com.narkisr.protocols :as proto]
+     )
   (:use (com.narkisr fs-logic common-fs file-info))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
-(def NAME_LENGTH 1024)
 (def BLOCK_SIZE 512)
 
 (gen-class :name com.narkisr.couch-fuse :implements [fuse.Filesystem3] :prefix "fs-")
 
-(def type-to-const {:directory FuseFtypeConstants/TYPE_DIR :file FuseFtypeConstants/TYPE_FILE :link FuseFtypeConstants/TYPE_SYMLINK})
-
 (def-fs-fn getdir [path filler] (directory? (lookup path)) Errno/ENOTDIR
   (let [node (lookup path)]
-    (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
+    (doseq [child (-> node :files vals) :let [ftype (proto/fuse-const child)] :when ftype]
       (. filler add (:name child) (. child hashCode) (bit-or ftype (:mode child))))))
 
 (defn- apply-attr [setter node fuse-type length]
   (. setter set (. node hashCode)
     (bit-or fuse-type (:mode node)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (:lastmod node ) (:lastmod node ) (:lastmod node)))
 
-(def-fs-fn getattr [path setter] (some #{(type (lookup path))} [:directory :file :link]) Errno/ENOENT
+(def-fs-fn getattr [path setter] (some #{(type (lookup path))} [:directory :file]) Errno/ENOENT
   (let [node (lookup path) ntype (type node)]
-    (condp = ntype
-      :directory (apply-attr setter node (type-to-const ntype) (* (. (:files node)  size) NAME_LENGTH)) ; TODO change size to clojure idiom
-      :file (apply-attr setter node (type-to-const ntype) (couch-file/fetch-size node))
-      :link (apply-attr setter node (type-to-const ntype) (. (:link node) size))
-      )))
+      (apply-attr setter node (proto/fuse-const node) (proto/size node))))
 
 (def-fs-fn open [path flags openSetter]
   (let [node (lookup path)]
@@ -86,5 +81,5 @@
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
-  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
+  (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 proto/NAME_LENGTH))
 

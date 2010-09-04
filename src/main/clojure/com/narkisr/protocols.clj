@@ -1,10 +1,13 @@
 (ns com.narkisr.protocols 
+  (:import fuse.FuseFtypeConstants)
   (:use (clojure.contrib (def :only [defmacro-])) 
         (com.narkisr common-fs file-info))
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]
             ))
+
+(def NAME_LENGTH 1024)
 
 (defn with-type [type x]
   (with-meta x {:type type}))
@@ -29,8 +32,10 @@
   (create [this]))
 
 (defprotocol FsMeta
-  (xattr [this])
   (size [this]))
+
+(defprotocol Fusable
+  (fuse-const [this]))
 
 (extend-type Directory 
   FsNode
@@ -39,7 +44,11 @@
    (create [this]
      (let-path [couch-id (fname path) parent (parent-path path)]
       (couch/create-document couch-id)
-      (fs-logic/add-file this))))
+      (fs-logic/add-file this)))
+  FsMeta
+   (size [this] (* (. (:files this)  size) NAME_LENGTH))
+  Fusable 
+   (fuse-const [this]  FuseFtypeConstants/TYPE_DIR))
 
 (extend-type File
   FsNode
@@ -51,7 +60,11 @@
      (let-path [couch-id (parent-name path) attach-id (fname path)]
       (couch/add-attachment couch-id attach-id "" "text/plain")
       (fs-logic/add-file (file-path path) (assoc this :size 0 ))     
-     ))) 
+     ))
+  FsMeta
+   (size [this] (-> this :size (apply [])))
+  Fusable 
+   (fuse-const [this]  FuseFtypeConstants/TYPE_FILE))
 
 (extend-type MetaFolder
   FsNode
@@ -59,7 +72,8 @@
      (let-path [doc-id (-> path un-hide fname)]
       (couch/delete-document doc-id)
       (fs-logic/remove-file path)))
-   (create [this]
-     (println "not legal")
-     ))
-
+   (create [this] (throw (java.lang.RuntimeException "meta folder cannot be created")))
+  FsMeta
+   (size [this] (* (. (:files this)  size) NAME_LENGTH))
+  Fusable 
+   (fuse-const [this]  FuseFtypeConstants/TYPE_DIR))
