@@ -20,8 +20,8 @@
 
 
 (defmacro let-path [values & body]
-     `(let [~(symbol "path") (:path ~'this)]
-            (let ~values ~@body)))
+  `(let [~(symbol "path") (:path ~'this)]
+    (let ~values ~@body)))
 
 (fstype Directory :files)
 (fstype MetaFolder :files)
@@ -31,11 +31,9 @@
   (delete [this])
   (create [this]))
 
-(defprotocol FsMeta
-  (size [this]))
+(defprotocol FsMeta (size [this]))
 
-(defprotocol Fusable
-  (fuse-const [this]))
+(defprotocol Fusable (fuse-const [this]))
 
 (extend-type Directory 
   FsNode

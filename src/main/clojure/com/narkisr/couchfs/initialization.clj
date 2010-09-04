@@ -6,7 +6,7 @@
   (:use (com.narkisr (file-info :only [fname parent-path combine parent-name file-path un-hide]) (fs-logic ))))
 
 (defn- inner-file [file-name desc mime content-fn size-fn couch-id ]
-  (with-type :file (File. file-name 0644 [:description desc :mimetype mime :couch-id couch-id] (/ (System/currentTimeMillis) 1000) content-fn size-fn)))
+  (File. file-name 0644 [:description desc :mimetype mime :couch-id couch-id] (/ (System/currentTimeMillis) 1000) content-fn size-fn))
 
 (defn- json-file [couch-id]
   (let [file-name (str couch-id ".json")]
@@ -22,8 +22,8 @@
 (defn document-folder [couch-id]
   (let [hidden (str "." couch-id)]
     (merge {hidden (with-xattr [:meta-folder true]
-                     (with-type :directory (MetaFolder. hidden 0444 [:description "Couch meta folder"] (/ (System/currentTimeMillis) 1000) (json-file couch-id))))}
-           {couch-id (with-type :directory (Directory. couch-id 0755 [:description "Couch attachments folder"] (/ (System/currentTimeMillis) 1000) (attachments couch-id)))})))
+                     (MetaFolder. hidden 0444 [:description "Couch meta folder"] (/ (System/currentTimeMillis) 1000) (json-file couch-id)))}
+           {couch-id (Directory. couch-id 0755 [:description "Couch attachments folder"] (/ (System/currentTimeMillis) 1000) (attachments couch-id))})))
 
 (defn couch-files []
   (reduce merge (map #(document-folder %) (couch/all-ids))))

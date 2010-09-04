@@ -23,7 +23,7 @@
 
 (def root (ref {})) ; must be binded when used to the actual root
 
-(defn directory? [node] (= (type node) :directory))
+(defn directory? [node] (contains? node :files))
 
 (defn filehandle? [node] (= (type node) :filehandle))
 

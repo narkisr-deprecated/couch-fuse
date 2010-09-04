@@ -1,8 +1,7 @@
 (ns com.narkisr.couchfs.couch-fs
   (:require [com.narkisr.couchfs.write-cache :as cache]
             [com.narkisr.couchfs.couch-file :as couch-file]
-            [com.narkisr.protocols :as proto]
-     )
+            [com.narkisr.protocols :as proto])
   (:use (com.narkisr fs-logic common-fs file-info))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
@@ -19,8 +18,8 @@
   (. setter set (. node hashCode)
     (bit-or fuse-type (:mode node)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (:lastmod node ) (:lastmod node ) (:lastmod node)))
 
-(def-fs-fn getattr [path setter] (some #{(type (lookup path))} [:directory :file]) Errno/ENOENT
-  (let [node (lookup path) ntype (type node)]
+(def-fs-fn getattr [path setter] (satisfies? proto/FsNode (lookup path)) Errno/ENOENT
+  (let [node (lookup path) ]
       (apply-attr setter node (proto/fuse-const node) (proto/size node))))
 
 (def-fs-fn open [path flags openSetter]
