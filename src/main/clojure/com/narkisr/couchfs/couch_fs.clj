@@ -1,7 +1,7 @@
 (ns com.narkisr.couchfs.couch-fs
-  (:require [com.narkisr.couchfs.write-cache :as cache])
-  (:use (com.narkisr.couchfs couch-file) 
-        (com.narkisr fs-logic common-fs file-info))
+  (:require [com.narkisr.couchfs.write-cache :as cache]
+            [com.narkisr.couchfs.couch-file :as couch-file])
+  (:use (com.narkisr fs-logic common-fs file-info))
   (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
 
 (def NAME_LENGTH 1024)
@@ -24,13 +24,13 @@
   (let [node (lookup path) ntype (type node)]
     (condp = ntype
       :directory (apply-attr setter node (type-to-const ntype) (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idiom
-      :file (apply-attr setter node (type-to-const ntype) (fetch-size node))
+      :file (apply-attr setter node (type-to-const ntype) (couch-file/fetch-size node))
       :link (apply-attr setter node (type-to-const ntype) (-> node :link (. size)))
       )))
 
 (def-fs-fn open [path flags openSetter]
   (let [node (lookup path)]
-    (. openSetter setFh (create-handle {:node node :content (fetch-content node)}))))
+    (. openSetter setFh (create-handle {:node node :content (couch-file/fetch-content node)}))))
 
 (def-fs-fn read [path fh buf offset] (filehandle? fh) Errno/EBADF
   (let [file (-> fh meta :node) content (-> fh meta :content)]
@@ -39,7 +39,7 @@
 (def-fs-fn flush [path fh] (filehandle? fh) Errno/EBADF
   (if (contains? @cache/write-cache path)
     (try
-      (update-file path (-> fh meta :node) (String. (@cache/write-cache path)))
+      (couch-file/update-file path (-> fh meta :node) (String. (@cache/write-cache path)))
      (catch Exception e (log-warn this (str (. e getMessage) (class e))))
      (finally (cache/clear-cache path)) ; no point in keeping bad cache values
       )))
@@ -55,10 +55,10 @@
     total-written))
 
 (def-fs-fn mknod [path mode rdev] 
-  (create-file path mode))
+  (couch-file/create-file path mode))
 
 (def-fs-fn mkdir [path mode] (under-root? path) Errno/EPERM
-  (create-folder path mode))
+  (couch-file/create-folder path mode))
 
 (def-fs-fn utime [path atime mtime]
   (update-atime path mtime))
@@ -71,18 +71,18 @@
 
 (def-fs-fn unlink [path] 
   (if (-> (lookup path) xattr-map :attachment)
-    (delete-file path)))
+    (couch-file/delete-file path)))
 
 (def-fs-fn chown [path uid gid]
   (log-warn "" "chwon not impl"))
 
 (def-fs-fn rename [from to]
-  (rename-file from to))
+  (couch-file/rename-file from to))
 
 (def-fs-fn rmdir [path] (and (under-root? path) (not (and (-> (lookup path) xattr-map :meta-folder) (lookup (un-hide path))))) Errno/EPERM
     (if (-> (lookup path) xattr-map :meta-folder) 
-      (delete-meta-folder path)
-      (delete-folder path)))
+      (couch-file/delete-meta-folder path)
+      (couch-file/delete-folder path)))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
