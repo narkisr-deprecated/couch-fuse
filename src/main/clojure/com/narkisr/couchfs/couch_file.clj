@@ -47,8 +47,8 @@
   ([file] (-> file :content (apply [])))
   ([file f] (-> file :content (apply []) f)))
 
-(defn fetch-size
-  ([file] (-> file :size (apply []))))
+(defn fetch-size [file] 
+  (-> file :size (apply [])))
 
 (defn rename-file [from to]
   "This expensive, couch does not have a rename built in https://issues.apache.org/jira/browse/COUCHDB-715"
