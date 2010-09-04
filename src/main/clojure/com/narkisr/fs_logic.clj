@@ -19,7 +19,7 @@
     (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
 (defn with-xattr [xattrs node]
-  (assoc node :xattrs (apply conj (node :xattrs) xattrs)))
+  (assoc node :xattrs (apply conj (:xattrs node) xattrs)))
 
 (def root (ref {})) ; must be binded when used to the actual root
 
@@ -27,7 +27,7 @@
 
 (defn filehandle? [node] (= (type node) :filehandle))
 
-(defn xattr-map [file]  (apply hash-map (file :xattrs)))
+(defn xattr-map [file]  (apply hash-map (:xattrs file)))
 
 (defn- path-match-to-keys [path]
   (match path

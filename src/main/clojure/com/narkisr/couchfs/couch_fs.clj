@@ -14,18 +14,18 @@
 (def-fs-fn getdir [path filler] (directory? (lookup path)) Errno/ENOTDIR
   (let [node (lookup path)]
     (doseq [child (-> node :files vals) :let [ftype (type-to-const (type child))] :when ftype]
-      (. filler add (child :name) (. child hashCode) (bit-or ftype (child :mode))))))
+      (. filler add (:name child) (. child hashCode) (bit-or ftype (:mode child))))))
 
 (defn- apply-attr [setter node fuse-type length]
   (. setter set (. node hashCode)
-    (bit-or fuse-type (node :mode)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (node :lastmod) (node :lastmod) (node :lastmod)))
+    (bit-or fuse-type (:mode node)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (:lastmod node ) (:lastmod node ) (:lastmod node)))
 
 (def-fs-fn getattr [path setter] (some #{(type (lookup path))} [:directory :file :link]) Errno/ENOENT
   (let [node (lookup path) ntype (type node)]
     (condp = ntype
-      :directory (apply-attr setter node (type-to-const ntype) (* (-> node :files (. size)) NAME_LENGTH)) ; TODO change size to clojure idiom
+      :directory (apply-attr setter node (type-to-const ntype) (* (. (:files node)  size) NAME_LENGTH)) ; TODO change size to clojure idiom
       :file (apply-attr setter node (type-to-const ntype) (couch-file/fetch-size node))
-      :link (apply-attr setter node (type-to-const ntype) (-> node :link (. size)))
+      :link (apply-attr setter node (type-to-const ntype) (. (:link node) size))
       )))
 
 (def-fs-fn open [path flags openSetter]
@@ -87,3 +87,4 @@
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]
   (. statfs-setter set BLOCK_SIZE 1000 200 180 (-> @root :files (. size)) 0 NAME_LENGTH))
+

@@ -2,8 +2,7 @@
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]
-            [com.narkisr.couchfs.initialization :as init]
-     )
+            [com.narkisr.couchfs.initialization :as init])
   (:use 
      (com.narkisr common-fs file-info )
      (couchdb (client :only [ResourceConflict]))
@@ -13,7 +12,7 @@
   (let [{:keys [couch-id attachment]} (fs-logic/xattr-map file)]
     (with-handler
       (if attachment 
-        (file-update/update-attachment path couch-id (file :name) contents-str)
+        (file-update/update-attachment path couch-id (:name file) contents-str)
         (file-update/update-rev-and-time path (couch/update-document couch-id (read-json contents-str))))
       (handle ResourceConflict [msg] 
               (file-update/use-lastest-rev path couch-id (read-json contents-str))))))

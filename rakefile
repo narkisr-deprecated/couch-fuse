@@ -24,6 +24,11 @@ task :mvnci => :logfile  do
 	mvn_with_ld 'clean install -o'
 end
 
+task :compile => :logfile  do
+	mvn_with_ld 'clojure:compile -o'
+	mvn_with_ld 'clojure:test -o'
+end
+
 task :default => [:package]
 
 task :logfile do
