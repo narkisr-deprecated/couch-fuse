@@ -3,7 +3,9 @@
             [com.narkisr.couchfs.couch-file :as couch-file]
             [com.narkisr.protocols :as proto])
   (:use (com.narkisr fs-logic common-fs file-info))
-  (:import fuse.FuseFtypeConstants fuse.Errno org.apache.commons.logging.LogFactory))
+  (:import fuse.FuseFtypeConstants fuse.Errno 
+           com.narkisr.protocols.MetaFolder
+           org.apache.commons.logging.LogFactory))
 
 (def BLOCK_SIZE 512)
 
@@ -73,8 +75,8 @@
 (def-fs-fn rename [from to]
   (couch-file/rename-file from to))
 
-(def-fs-fn rmdir [path] (and (under-root? path) (not (and (-> (lookup path) xattr-map :meta-folder) (lookup (un-hide path))))) Errno/EPERM
-    (if (-> (lookup path) xattr-map :meta-folder) 
+(def-fs-fn rmdir [path] (and (under-root? path) (not (and (instance? MetaFolder (lookup path)) (lookup (un-hide path))))) Errno/EPERM
+    (if (instance? MetaFolder (lookup path))
       (couch-file/delete-meta-folder path)
       (couch-file/delete-folder path)))
 

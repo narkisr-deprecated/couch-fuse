@@ -21,8 +21,7 @@
 
 (defn document-folder [couch-id]
   (let [hidden (str "." couch-id)]
-    (merge {hidden (with-xattr [:meta-folder true]
-                     (MetaFolder. hidden 0444 [:description "Couch meta folder"] (/ (System/currentTimeMillis) 1000) (json-file couch-id)))}
+    (merge {hidden (MetaFolder. hidden 0444 [:description "Couch meta folder"] (/ (System/currentTimeMillis) 1000) (json-file couch-id))}
            {couch-id (Directory. couch-id 0755 [:description "Couch attachments folder"] (/ (System/currentTimeMillis) 1000) (attachments couch-id))})))
 
 (defn couch-files []
