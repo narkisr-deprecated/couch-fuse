@@ -2,9 +2,10 @@
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]
+            [com.narkisr.protocols :as proto]
             [com.narkisr.couchfs.initialization :as init])
   (:use 
-     (com.narkisr common-fs file-info )
+     (com.narkisr common-fs file-info)
      (couchdb (client :only [ResourceConflict]))
      (clojure.contrib (error-kit :only [handle with-handler]) (json :only [read-json]))))
 
@@ -26,21 +27,16 @@
 
 (defn create-folder [path mode]
   (let [couch-id (fname path) parent (parent-path path)]
-    (couch/create-document couch-id)
-    (doseq [[k v] (init/document-folder couch-id)]
-      (fs-logic/add-file (combine parent k) v))))
+    (proto/create (init/content-folder couch-id) (combine parent couch-id))
+    (proto/create (init/meta-folder couch-id (hide couch-id)) (combine parent (hide couch-id)))))
 
 (defn create-file [path mode]
   "Adds an empty attachment to the given document path, update file will fill the missing data"
-  (let [couch-id (parent-name path) attach-id (fname path)]
-    (couch/add-attachment couch-id attach-id "" "text/plain")
-    (fs-logic/add-file (file-path path) (init/attachment couch-id attach-id {:content_type "" :length 0}) )))
+   (proto/create (init/attachment (parent-name path) (fname path) {:content_type "" :length 0}) path))
 
 (defn delete-file [path]
-  "Deletes only attachments"
-  (let [couch-id (parent-name path) attach-id (fname path)]
-    (couch/delete-attachment couch-id attach-id)
-    (fs-logic/remove-file path)))
+  "Delete only attachments"
+  (proto/delete (fs-logic/lookup path)))
 
 (defn fetch-content
   ([file] (-> file :content (apply [])))

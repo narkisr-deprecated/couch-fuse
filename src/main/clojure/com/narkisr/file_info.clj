@@ -11,6 +11,8 @@
 
 (defn file-path [file] (-> file (File.) (.getPath)))
 
+(defn hide [name] (str "." name))
+
 (defn hidden [folder] (str (parent-path folder) "/." (fname folder)))
 
 (defn un-hide [folder]

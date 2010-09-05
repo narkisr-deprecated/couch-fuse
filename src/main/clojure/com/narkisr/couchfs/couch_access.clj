@@ -21,7 +21,8 @@
   (lazy-seq (filter not-design-id (couch document-list))))
 
 (defn attachments [name]
-  (couch attachment-list name))
+  (try (couch attachment-list name)
+    (catch java.io.FileNotFoundException e {})))
 
 (defn add-attachment [id name contents mimetype]
   (couch attachment-create id name contents mimetype))

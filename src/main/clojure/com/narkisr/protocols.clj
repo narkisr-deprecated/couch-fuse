@@ -29,7 +29,7 @@
 
 (defprotocol FsNode
   (delete [this])
-  (create [this]))
+  (create [this path]))
 
 (defprotocol FsMeta (size [this]))
 
@@ -39,10 +39,10 @@
   FsNode
    (delete [this]
      (fs-logic/remove-file (:path this)))
-   (create [this]
-     (let-path [couch-id (fname path) parent (parent-path path)]
+   (create [this path]
+    (let [couch-id (fname path) parent (parent-path path)]
       (couch/create-document couch-id)
-      (fs-logic/add-file this)))
+      (fs-logic/add-file path (assoc this :path path))))
   FsMeta
    (size [this] (* (. (:files this)  size) NAME_LENGTH))
   Fusable 
@@ -54,11 +54,10 @@
      (let-path [couch-id (parent-name path) attach-id (fname path)]
       (couch/delete-attachment couch-id attach-id)
       (fs-logic/remove-file path)))
-   (create [this] 
-     (let-path [couch-id (parent-name path) attach-id (fname path)]
+   (create [this path] 
+     (let [couch-id (parent-name path) attach-id (fname path)]
       (couch/add-attachment couch-id attach-id "" "text/plain")
-      (fs-logic/add-file (file-path path) (assoc this :size 0 ))     
-     ))
+      (fs-logic/add-file (file-path path) (assoc this :path path))))
   FsMeta
    (size [this] (-> this :size (apply [])))
   Fusable 
@@ -70,7 +69,8 @@
      (let-path [doc-id (-> path un-hide fname)]
       (couch/delete-document doc-id)
       (fs-logic/remove-file path)))
-   (create [this] (throw (java.lang.RuntimeException "meta folder cannot be created")))
+   (create [this path] 
+     (fs-logic/add-file path (assoc this :path path)))
   FsMeta
    (size [this] (* (. (:files this)  size) NAME_LENGTH))
   Fusable 
