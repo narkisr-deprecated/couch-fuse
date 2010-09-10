@@ -1,8 +1,10 @@
 (ns com.narkisr.couchfs.couch-fs
   (:require [com.narkisr.couchfs.write-cache :as cache]
             [com.narkisr.couchfs.couch-file :as couch-file]
+            [com.narkisr.file-info :as info]
+            [com.narkisr.couchfs.initialization :as init]
             [com.narkisr.protocols :as proto])
-  (:use (com.narkisr fs-logic common-fs file-info))
+  (:use (com.narkisr fs-logic common-fs))
   (:import fuse.FuseFtypeConstants fuse.Errno 
            com.narkisr.protocols.MetaFolder
            org.apache.commons.logging.LogFactory))
@@ -54,7 +56,9 @@
   (couch-file/create-file path mode))
 
 (def-fs-fn mkdir [path mode] (under-root? path) Errno/EPERM
-  (couch-file/create-folder path mode))
+  (let [couch-id (info/fname path) parent (info/parent-path path)]
+   (proto/create (init/content-folder couch-id) (info/combine parent couch-id))
+   (proto/create (init/meta-folder couch-id (info/hide couch-id)) (info/combine parent (info/hide couch-id)))))
 
 (def-fs-fn utime [path atime mtime]
   (update-atime path mtime))
@@ -75,10 +79,8 @@
 (def-fs-fn rename [from to]
   (couch-file/rename-file from to))
 
-(def-fs-fn rmdir [path] (and (under-root? path) (not (and (instance? MetaFolder (lookup path)) (lookup (un-hide path))))) Errno/EPERM
-    (if (instance? MetaFolder (lookup path))
-      (couch-file/delete-meta-folder path)
-      (couch-file/delete-folder path)))
+(def-fs-fn rmdir [path] (and (under-root? path) (not (and (instance? MetaFolder (lookup path)) (lookup (info/un-hide path))))) Errno/EPERM
+    (proto/delete (lookup path)))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

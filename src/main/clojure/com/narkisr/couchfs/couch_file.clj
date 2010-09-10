@@ -18,18 +18,6 @@
       (handle ResourceConflict [msg] 
               (file-update/use-lastest-rev path couch-id (read-json contents-str))))))
 
-(defn delete-folder [path]
-  (fs-logic/remove-file path))
-
-(defn delete-meta-folder [path]
-  (couch/delete-document (-> path un-hide fname))
-  (fs-logic/remove-file path))
-
-(defn create-folder [path mode]
-  (let [couch-id (fname path) parent (parent-path path)]
-    (proto/create (init/content-folder couch-id) (combine parent couch-id))
-    (proto/create (init/meta-folder couch-id (hide couch-id)) (combine parent (hide couch-id)))))
-
 (defn create-file [path mode]
   "Adds an empty attachment to the given document path, update file will fill the missing data"
    (proto/create (init/attachment (parent-name path) (fname path) {:content_type "" :length 0}) path))
@@ -46,7 +34,7 @@
   (-> file :size (apply [])))
 
 (defn rename-file [from to]
-  "This expensive, couch does not have a rename built in https://issues.apache.org/jira/browse/COUCHDB-715"
+  "This is expensive, couch does not have a rename built in https://issues.apache.org/jira/browse/COUCHDB-715"
   (let [content (String. (fetch-content (fs-logic/lookup from)))]
     (delete-file from)
     (create-file to 0644)

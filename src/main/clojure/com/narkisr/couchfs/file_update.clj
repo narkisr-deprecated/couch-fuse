@@ -1,7 +1,6 @@
 (ns com.narkisr.couchfs.file-update
   (:use 
-     (com.narkisr.couchfs 
-          (couch-access :only [couch-attachment-content add-attachment update-document get-document]))
+     (com.narkisr.couchfs (couch-access :only [couch-attachment-content add-attachment update-document get-document]))
      (com.narkisr (fs-logic :only [update update-atime]))))
 
 (defn update-rev-and-time [path rev-map]
