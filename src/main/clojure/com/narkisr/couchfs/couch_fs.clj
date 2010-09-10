@@ -54,7 +54,8 @@
     total-written))
 
 (def-fs-fn mknod [path mode rdev] 
-  (couch-file/create-file path mode))
+  (proto/create 
+    (init/attachment (info/parent-name path) (info/fname path) {:content_type "" :length 0}) path))
 
 (def-fs-fn mkdir [path mode] (fs-logic/under-root? path) Errno/EPERM
   (let [couch-id (info/fname path) parent (info/parent-path path)]

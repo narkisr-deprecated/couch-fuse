@@ -4,8 +4,7 @@
         (com.narkisr common-fs file-info))
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
-            [com.narkisr.fs-logic :as fs-logic]
-            ))
+            [com.narkisr.fs-logic :as fs-logic]))
 
 (def NAME_LENGTH 1024)
 
