@@ -20,10 +20,13 @@ def mvn_with_ld(goal)
 	sh "mvn #{goal}"
 end
 
+
+desc "maven clean install with ld path"
 task :mvnci => :logfile  do
 	mvn_with_ld 'clean install -o'
 end
 
+desc "maven compile and test with ld path"
 task :compile => :logfile  do
 	mvn_with_ld 'clojure:compile -o'
 	mvn_with_ld 'clojure:test -o'
@@ -36,6 +39,7 @@ task :logfile do
 	sh 'sudo chmod 666 /var/log/couchfuse.log'
 end
 
+desc "create jar using maven assembly plugin"
 file jar => ['native/javafs',:logfile] do
 	mkdir 'fake' unless File.exists? 'fake'
 	mvn_with_ld('assembly:assembly') unless File.exists? "target/#{jar}"
@@ -74,11 +78,13 @@ task :clean  do
 	sh 'mvn clean'
 end
 
+desc "builds the deb package"
 task :deb => [:sandbox] do 
 	['control','rules','dirs','postinst','prerm'].each{|f| cp "../../packaging/debian/#{f}",'debian/' } 
 	sh 'sudo dpkg-buildpackage'
 end
 
+desc "build the deb sandbox folder"
 task :sandbox => [:package] do
 	mkdir('sandbox') unless File.exists?('sandbox')
 	cp "pkg/#{tar}" , 'sandbox'
