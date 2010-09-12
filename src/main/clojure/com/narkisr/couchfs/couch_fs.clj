@@ -14,7 +14,8 @@
 
 (gen-class :name com.narkisr.couch-fuse :implements [fuse.Filesystem3] :prefix "fs-")
 
-(def-fs-fn getdir [path filler] (fs-logic/directory? (fs-logic/lookup path)) Errno/ENOTDIR
+(def-fs-fn getdir [path filler] 
+  {:pre [[(fs-logic/directory? (fs-logic/lookup path)) Errno/ENOTDIR]]}
   (let [node (fs-logic/lookup path)]
     (doseq [child (-> node :files vals) :let [ftype (proto/fuse-const child)] :when ftype]
       (. filler add (:name child) (. child hashCode) (bit-or ftype (:mode child))))))
@@ -23,7 +24,8 @@
   (. setter set (. node hashCode)
     (bit-or fuse-type (:mode node)) 1 0 0 0 length (/ (+ length (- BLOCK_SIZE 1)) BLOCK_SIZE) (:lastmod node ) (:lastmod node ) (:lastmod node)))
 
-(def-fs-fn getattr [path setter] (satisfies? proto/FsNode (fs-logic/lookup path)) Errno/ENOENT
+(def-fs-fn getattr [path setter] 
+  {:pre [[(satisfies? proto/FsNode (fs-logic/lookup path)) Errno/ENOENT]]}
   (let [node (fs-logic/lookup path) ]
       (apply-attr setter node (proto/fuse-const node) (proto/size node))))
 
@@ -31,11 +33,13 @@
   (let [node (fs-logic/lookup path)]
     (. openSetter setFh (fs-logic/create-handle {:node node :content (couch-file/fetch-content node)}))))
 
-(def-fs-fn read [path fh buf offset] (fs-logic/filehandle? fh) Errno/EBADF
+(def-fs-fn read [path fh buf offset] 
+  {:pre [[(fs-logic/filehandle? fh) Errno/EBADF]]}
   (let [file (-> fh meta :node) content (-> fh meta :content)]
     (. buf put content offset (min (. buf remaining) (- (alength content) offset)))))
 
-(def-fs-fn flush [path fh] (fs-logic/filehandle? fh) Errno/EBADF
+(def-fs-fn flush [path fh] 
+  {:pre [[(fs-logic/filehandle? fh) Errno/EBADF]]}
   (if (contains? @cache/write-cache path)
     (try
       (couch-file/update-file path (-> fh meta :node) (String. (@cache/write-cache path)))
@@ -43,11 +47,14 @@
      (finally (cache/clear-cache path)) ; no point in keeping bad cache values
       )))
 
-(def-fs-fn release [path fh flags] (fs-logic/filehandle? fh) Errno/EBADF (System/runFinalization))
+(def-fs-fn release [path fh flags] 
+  {:pre [[(fs-logic/filehandle? fh) Errno/EBADF]]}
+  (System/runFinalization))
 
 (def-fs-fn truncate [path size])
 
-(def-fs-fn write [path fh is-writepage buf offset] (fs-logic/filehandle? fh) Errno/EROFS
+(def-fs-fn write [path fh is-writepage buf offset] 
+  {:pre [[(fs-logic/filehandle? fh) Errno/EROFS]]}
   (let [total-written (min (. buf remaining) 256) b (byte-array total-written)]
     (. buf get b 0 total-written)
     (cache/update-cache path b)
@@ -57,7 +64,8 @@
   (proto/create 
     (init/attachment (info/parent-name path) (info/fname path) {:content_type "" :length 0}) path))
 
-(def-fs-fn mkdir [path mode] (fs-logic/under-root? path) Errno/EPERM
+(def-fs-fn mkdir [path mode] 
+  {:pre [[(fs-logic/under-root? path) Errno/EPERM]]}
   (let [couch-id (info/fname path) parent (info/parent-path path)]
    (proto/create (init/content-folder couch-id) (info/combine parent couch-id))
    (proto/create (init/meta-folder couch-id (info/hide couch-id)) (info/combine parent (info/hide couch-id)))))
@@ -81,7 +89,11 @@
 (def-fs-fn rename [from to]
   (couch-file/rename-file from to))
 
-(def-fs-fn rmdir [path] (and (fs-logic/under-root? path) (not (and (instance? MetaFolder (fs-logic/lookup path)) (fs-logic/lookup (info/un-hide path))))) Errno/EPERM
+(defn meta-and-content-exists? [path]
+  (and (instance? MetaFolder (fs-logic/lookup path)) (fs-logic/lookup (info/un-hide path))))
+
+(def-fs-fn rmdir [path] 
+  {:pre [[(fs-logic/under-root? path)] [(-> path meta-and-content-exists? not)]] :default Errno/EPERM}
     (proto/delete (fs-logic/lookup path)))
 
 ; file systems stats
