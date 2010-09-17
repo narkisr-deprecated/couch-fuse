@@ -41,6 +41,7 @@ install: build
 	# mkdir -p $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp -r native $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp *.jar $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
+	cp log4j.properties $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp couchfuse $(CURDIR)/debian/couch-fuse/usr/bin/
 
 

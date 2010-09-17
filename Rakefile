@@ -44,11 +44,12 @@ file jar => ['native/javafs',:logfile] do
 	mkdir 'fake' unless File.exists? 'fake'
 	mvn_with_ld('assembly:assembly') unless File.exists? "target/#{jar}"
 	cp "target/#{jar}" , pwd
+	cp 'target/classes/log4j.properties' , pwd
 end 
 
 file 'couchfuse' do
 	path = "/usr/lib/jvm/java-6-sun/jre/lib/#{server_path}/server"
-	launch = "java -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} '#{name_ver} filesystem' $@"
+	launch = "java -Dlog4j.configuration='file:/usr/share/couchfuse/log4j.properties' -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} '#{name_ver} filesystem' $@"
 	script = "" 
 	File.open('packaging/couchfuse.bin' , 'r') { |f| script = f.read }
 	template = ERB.new(script)
@@ -62,7 +63,7 @@ end
 
 Rake::PackageTask.new(name, version)  do |pack|
 	pack.need_tar_gz = true
-	pack.package_files.include(jar,'couchfuse','native/javafs','native/libjavafs.so')
+	pack.package_files.include(jar,'couchfuse','native/javafs','native/libjavafs.so','log4j.properties')
 end
 
 task :fusebuild do
@@ -73,13 +74,13 @@ task :fusebuild do
 end
 
 task :clean  do
-	([jar] + %w( pkg javafs native couchfuse)).each {|f| rm_r f if File.exists? f}
+	([jar] + %w(pkg javafs native couchfuse log4j.properties)).each {|f| rm_r f if File.exists? f}
 	sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
 	sh 'mvn clean'
 end
 
 desc "builds the deb package"
-task :deb => [:sandbox] do 
+task :deb => [:clean, :sandbox] do 
 	['control','rules','dirs','postinst','prerm'].each{|f| cp "../../packaging/debian/#{f}",'debian/' } 
 	sh 'sudo dpkg-buildpackage'
 end

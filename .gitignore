@@ -5,6 +5,8 @@ couch-fuse.ipr
 couch-fuse.iws
 couchfuse
 *.swp
+*.swo
+*.properties
 sandbox
 fake
 native

@@ -19,5 +19,5 @@
       `(defn ~fn-name ~(into ['this] args)
          (let [error# (first-error (:pre ~pre))]
           (if-not error# 
-           (do #_(log-info 'this (str "calling - > " ~fn-name)) ~body (identity 0)) 
+           (do (log-info 'this (str "calling - > " ~fn-name)) ~body (identity 0)) 
             (or (second error#) (:default ~pre) )))))))
