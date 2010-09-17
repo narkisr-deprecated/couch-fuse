@@ -38,7 +38,6 @@ install: build
 	dh_testroot
 	dh_prep  
 	dh_installdirs
-	# mkdir -p $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp -r native $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp *.jar $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
 	cp log4j.properties $(CURDIR)/debian/couch-fuse/usr/share/couchfuse/
