@@ -1,6 +1,6 @@
 (ns com.narkisr.fs-logic
   (:import java.io.File)
-  (:use (clojure.contrib (def :only [defmacro-])) 
+  (:use (clojure.contrib (def :only [defmacro-]) (core :only [dissoc-in])) 
         (com.narkisr (file-info :only [split-path]))
          pattern-match))
 
@@ -14,9 +14,6 @@
 (def-fstype file :content :size)
 (def-fstype link :link)
 
-(defmacro create-node [type & values]
-  `(with-type ~(clojure.lang.Keyword/intern type)
-    (struct ~type ~@values ~(/ (System/currentTimeMillis) 1000))))
 
 (defn with-xattr [xattrs node]
   (assoc node :xattrs (apply conj (:xattrs node) xattrs)))
@@ -61,7 +58,7 @@
   (dosync (ref-set root (assoc-in @root (lookup-keys path) file))))
 
 (defn remove-file [path]
-  (dosync (ref-set root (assoc-in @root (lookup-keys path) nil))))
+  (dosync (ref-set root (dissoc-in @root (lookup-keys path)))))
 
 (defn create-handle [metadata]
   (let [type-data {:type :filehandle}]

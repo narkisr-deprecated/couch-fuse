@@ -22,6 +22,7 @@
   `(let [~(symbol "path") (:path ~'this)]
     (let ~values ~@body)))
 
+(fstype Root :files)
 (fstype Directory :files)
 (fstype MetaFolder :files)
 (fstype File :content :size)
@@ -33,6 +34,15 @@
 (defprotocol FsMeta (size [this]))
 
 (defprotocol Fusable (fuse-const [this]))
+
+(extend-type Root 
+  FsNode
+   (delete [this])
+   (create [this path])
+  FsMeta
+   (size [this] (* (. (:files this)  size) NAME_LENGTH))
+  Fusable 
+   (fuse-const [this]  FuseFtypeConstants/TYPE_DIR))
 
 (extend-type Directory 
   FsNode

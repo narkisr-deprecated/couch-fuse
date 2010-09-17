@@ -1,5 +1,6 @@
 (ns com.narkisr.couchfs.initialization
   (:import com.narkisr.protocols.Directory 
+           com.narkisr.protocols.Root
            com.narkisr.protocols.MetaFolder
            com.narkisr.protocols.File)
   (:require [com.narkisr.couchfs.couch-access :as couch])
@@ -35,5 +36,5 @@
   (reduce merge (map #(document-folders %) (couch/all-ids))))
 
 (defn init-fs-root []
-  (dosync (ref-set root (create-node directory "" 0755 [:description "Couchdb directory"] (couch-files)))))
+  (dosync (ref-set root (Root. ""  0755 [:description "Root directory"] (/ (System/currentTimeMillis) 1000) (couch-files)))))
 

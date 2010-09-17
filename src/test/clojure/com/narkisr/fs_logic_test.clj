@@ -1,11 +1,15 @@
 (ns com.narkisr.fs-logic-test
-  (:use clojure.contrib.test-is com.narkisr.fs-logic))
+  (:use clojure.contrib.test-is com.narkisr.fs-logic)
+  (:import com.narkisr.protocols.Directory 
+           com.narkisr.protocols.Root
+           com.narkisr.protocols.MetaFolder
+           com.narkisr.protocols.File))
 
 (defn init [f]
-  (dosync (ref-set root (create-node directory "" 0755 [:description "Root directory"]
-    {"README" (create-node file "README" 0644 [:description "A Readme File" :mimetype "text/plain"] (. "this is a nice readme contents" getBytes))})))
-  (f)
-  )
+  (let [content "some nice content"]
+    (dosync (ref-set root (Root. "" 0755 [:description "Root directory"] 0
+      {"README" (File. "README" 0644 [:description "A Readme File" :mimetype "text/plain"] 0 (. content getBytes) (. content length) )})))
+    (f)))
 
 (use-fixtures :once init)
 
@@ -15,12 +19,12 @@
 
 (deftest key-looup-test
   (is (= (lookup-keys "/bla/name/bl.txt") '(:files "bla" :files "name" :files))))
-;
+
 (deftest node-creation
-  (let [file (create-node file "bla.txt" 0644 [:description "" :mimetype ""] nil nil)]
+  (let [file (File. "bla.txt" 0644 [:description "" :mimetype ""] 0 nil nil)]
     (add-file "/bla.txt" file)
     (is (= file (lookup "/bla.txt")))))
-;
+
 (deftest node-deletion
   (remove-file "/bla.txt")
   (is (nil? (lookup "/bla.txt"))))
