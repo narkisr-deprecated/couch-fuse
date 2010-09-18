@@ -34,7 +34,11 @@
   (is (= (-> "fake/foo/" (File.) (.delete)) true))
   (is (= (-> "fake/.foo/" (File.) (.delete)) true))
   (is (= (sh "ls" "fake") (str uuid "\n"))))
-    
+
+(deftest folder-deletion-bash
+  (is (= (sh "mkdir" "fake/foo") ""))
+  (is (= (sh "rm" "-r" "fake/foo") ""))
+  (is (= (sh "rm" "-r" "fake/.foo") "")))
 
 (deftest mkdir-only-on-root
   (do-template 

@@ -81,7 +81,7 @@
 
 (def-fs-fn unlink [path] 
   (if (-> (fs-logic/lookup path) fs-logic/xattr-map :attachment)
-    (proto/delete (fs-logic/lookup path))))
+    (proto/delete (fs-logic/lookup path) path)))
 
 (def-fs-fn chown [path uid gid]
   (log-warn "" "chwon not impl"))
@@ -94,7 +94,7 @@
 
 (def-fs-fn rmdir [path] 
   {:pre [[(fs-logic/under-root? path)] [(-> path meta-and-content-exists? not)]] :default Errno/EPERM}
-    (proto/delete (fs-logic/lookup path)))
+    (proto/delete (fs-logic/lookup path) path))
 
 ; file systems stats
 (def-fs-fn statfs [statfs-setter]

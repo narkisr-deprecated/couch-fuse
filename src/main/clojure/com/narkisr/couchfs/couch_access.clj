@@ -8,7 +8,7 @@
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) (duck-streams :only [to-byte-array]))))
 
 (def *host* "http://127.0.0.1:5984/")
-(def *db* "blog-import")
+(def *db* "playground")
 
 (defn couch [fn & params]
   "Applies the binded couch configuration on the given fn, this cannot be a macro since the values are binded post the expansion stage"

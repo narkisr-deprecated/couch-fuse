@@ -36,5 +36,5 @@
   (reduce merge (map #(document-folders %) (couch/all-ids))))
 
 (defn init-fs-root []
-  (dosync (ref-set root (Root. ""  0755 [:description "Root directory"] (/ (System/currentTimeMillis) 1000) (couch-files)))))
+  (dosync (ref-set root (Root. ""  0755 [:description "Root directory"] (/ (System/currentTimeMillis) 1000) (or (couch-files) {})))))
 

@@ -26,6 +26,6 @@
   "This is expensive, couch does not have a rename built in https://issues.apache.org/jira/browse/COUCHDB-715,
    Adds an empty attachment to the given document path, update file will fill the missing data"
   (let [content (String. (fetch-content (fs-logic/lookup from)))]
-    (proto/delete (fs-logic/lookup from))
+    (proto/delete (fs-logic/lookup from) from)
     (proto/create (init/attachment (parent-name to) (fname to) {:content_type "" :length 0}) to) 
     (update-file to (fs-logic/lookup to) content)))

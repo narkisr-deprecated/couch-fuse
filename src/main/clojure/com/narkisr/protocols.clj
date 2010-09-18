@@ -17,18 +17,13 @@
 (defmacro- fstype [name & keys]
   `(defrecord ~name ~(into-syms keys)))
 
-
-(defmacro let-path [values & body]
-  `(let [~(symbol "path") (:path ~'this)]
-    (let ~values ~@body)))
-
 (fstype Root :files)
 (fstype Directory :files)
 (fstype MetaFolder :files)
 (fstype File :content :size)
 
 (defprotocol FsNode
-  (delete [this])
+  (delete [this path])
   (create [this path]))
 
 (defprotocol FsMeta (size [this]))
@@ -37,21 +32,21 @@
 
 (extend-type Root 
   FsNode
-   (delete [this])
+   (delete [this path])
    (create [this path])
   FsMeta
-   (size [this] (* (. (:files this)  size) NAME_LENGTH))
+   (size [this] (* (. (or (:files this) '())  size) NAME_LENGTH))
   Fusable 
    (fuse-const [this]  FuseFtypeConstants/TYPE_DIR))
 
 (extend-type Directory 
   FsNode
-   (delete [this]
-     (fs-logic/remove-file (:path this)))
+   (delete [this path]
+     (fs-logic/remove-file path))
    (create [this path]
     (let [couch-id (fname path) parent (parent-path path)]
       (couch/create-document couch-id)
-      (fs-logic/add-file path (assoc this :path path))))
+      (fs-logic/add-file path this)))
   FsMeta
    (size [this] (* (. (:files this)  size) NAME_LENGTH))
   Fusable 
@@ -59,14 +54,14 @@
 
 (extend-type File
   FsNode
-   (delete [this]
-     (let-path [couch-id (parent-name path) attach-id (fname path)]
+   (delete [this path]
+     (let [couch-id (parent-name path) attach-id (fname path)]
       (couch/delete-attachment couch-id attach-id)
       (fs-logic/remove-file path)))
    (create [this path] 
      (let [couch-id (parent-name path) attach-id (fname path)]
       (couch/add-attachment couch-id attach-id "" "text/plain")
-      (fs-logic/add-file (file-path path) (assoc this :path path))))
+      (fs-logic/add-file (file-path path) this)))
   FsMeta
    (size [this] (-> this :size (apply [])))
   Fusable 
@@ -74,12 +69,12 @@
 
 (extend-type MetaFolder
   FsNode
-   (delete [this]
-     (let-path [doc-id (-> path un-hide fname)]
+   (delete [this path]
+     (let [doc-id (-> path un-hide fname)]
       (couch/delete-document doc-id)
       (fs-logic/remove-file path)))
    (create [this path] 
-     (fs-logic/add-file path (assoc this :path path)))
+     (fs-logic/add-file path this))
   FsMeta
    (size [this] (* (. (:files this)  size) NAME_LENGTH))
   Fusable 
