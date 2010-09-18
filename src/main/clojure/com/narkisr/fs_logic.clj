@@ -1,6 +1,6 @@
 (ns com.narkisr.fs-logic
   (:import java.io.File)
-  (:use (clojure.contrib (def :only [defmacro-]) (core :only [dissoc-in])) 
+  (:use (clojure.contrib (def :only [defmacro-])) 
         (com.narkisr (file-info :only [split-path]))
          pattern-match))
 
@@ -25,6 +25,9 @@
 (defn filehandle? [node] (= (type node) :filehandle))
 
 (defn xattr-map [file]  (apply hash-map (:xattrs file)))
+
+(defn dissoc-in [data keys]
+  (assoc-in data (butlast keys) (dissoc (get-in data (butlast keys)) (last keys)))) 
 
 (defn- path-match-to-keys [path]
   (match path
