@@ -1,5 +1,5 @@
 Couch-fuse its a Couchdb Fuse filesystem it enables a mount of a Couchdb database into a local folder.
-This comes handy for backup, editing and any other task that it easy to accomplish via a filesystem interface, see this [demo](http://www.youtube.com/watch?v=ps3-CnqKVxU).
+This comes handy for backup, editing and any other task that it easy to accomplish via a filesystem interface, see this [demo](http://www.youtube.com/watch?v=PxD9SroHhWE).
 
 In order to install:
 
