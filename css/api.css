@@ -1,0 +1,61 @@
+#content .api .klass {
+  
+}
+#content .api .klass hr {
+  height: 0px;
+  color: #E5E5E5;
+}
+#content .api .klass h2 {
+  background: #E5E5E5;
+  color: #666;
+  font-size: 20px;
+  padding: 5px;
+  margin: 0px;
+  border: none;
+}
+#content .api .klass h3 {
+  color: #666;
+  font-size: 20px;
+  padding: 5px;
+  margin: 0px;
+}
+#content .api .klass ul {
+  list-style: none;
+  margin: 0px;
+  padding: 10px;
+}
+
+#content .api .klass .doc h2 {
+  background: #EEE;
+  color: #333;
+  font-size: 30px;
+  padding: 5px;
+  margin: 0px;
+  border: none;
+}
+#content .api .klass .doc h3 {
+  
+}
+#content .api .klass .doc h4 {
+  
+}
+#content .api .attr h4, 
+#content .api .meth h4 {
+  background: #E5E5E5;
+  color: #333;
+  margin: 10px 0px 0px 0px;
+  padding: 5px;
+}
+#content .api h4 span {
+  color: #697D93;
+} 
+#content .api .meth .doc h3 {
+  border: none;
+  font-size: 18px;
+  padding: 5px 0px;
+  margin: 5px 0px;
+}
+#content .api .doc table,
+#content .api .doc table td {
+  border:none;
+}

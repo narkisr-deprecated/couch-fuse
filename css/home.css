@@ -1,0 +1,45 @@
+#projects_popular {
+	
+}
+#projects_other {
+	
+}
+.repo {
+	width: 50%;
+	float:left;
+	height: 100px;
+}
+#projects_popular .repo {
+	height: 140px;
+}
+#projects_popular .repo h3 {
+	color: #CCC;
+}
+#projects_popular .repo h3 a {
+	font-size: 22px;
+	color:#996328;
+	text-decoration:none;
+}
+#projects_popular .repo h3 a:hover {
+	color:#333;
+}
+#projects_popular .repo .url a {
+  font-size: 14px;
+  text-decoration:none;
+}
+#projects_popular .repo p {
+	font-size: 18px;
+	color:#666;
+}
+
+#projects_other .repo h3 {
+	margin-bottom: 0px;
+}
+#projects_other .repo h3 a {
+	text-decoration: none;
+}
+#projects_other .repo p {
+	font-size: 14px;
+	color:#666;
+}
+

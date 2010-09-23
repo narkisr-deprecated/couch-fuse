@@ -1,0 +1,153 @@
+---
+layout: couch
+title: couch-fuse
+github_name: couch-fuse
+current_version: 0.3
+nav:
+  - name: What
+    link: "#what"
+  - name: Why
+    link: "#why"
+  - name: Usage
+    link: "#usage"
+  - name: Options
+    link: "#options"
+  - name: Dependencies
+    link: "#dependencies"
+---
+
+h2(project_name). {{ page.github_name }}
+
+h3(#what). What
+
+Couchfuse is a FUSE filesystem that exposes Couchdb databases as filesystem folder.
+
+h3(#why). Why
+
+Couchdb exposes an easy to use HTTP API however for some tasks using a filesystem UI is preferable, easy backup using rsync or text editing using your favorite text editor.
+
+h3(#usage). Usage
+
+{% highlight bash %}
+$ couchfuse -db db_name -path mount_path
+# in order to create a new doc
+$ mkdir mount_path/foo
+# each document is represented by two folders:
+  * the first is the meta folder that contains the document json
+  * the second contains attachments
+$ find mount_path/
+    mount_path/.foo/foo.json
+    mount_path/foo
+# we can backup the db using rsync
+$ rsync -auv mount_path/ /some/backup/storage
+# document is editable, json must be kept valid
+$ vi mount_path/.foo/foo.json
+# attachmens show up under the attachment folder
+$ cp another.jpeg mount_path/foo && ls mount_path/foo
+   another.jpeg
+# in order to delete a document both attahments and meta folder should be cleared, starting with attachments
+$ rm -r mount_path/.foo
+  rm: cannot remove directory `fake/.foo': Operation not permitted
+# this will work
+$ rm -r mount_path/foo && rm -r mount_path/.foo
+{% endhighlight %}
+
+<object width="480" height="385"><param name="movie" value="http://www.youtube.com/v/PxD9SroHhWE?fs=1&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/PxD9SroHhWE?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed></object>
+
+h4. Basic
+
+Run:
+
+{% highlight bash %}
+$ sinatra-gen [appname] [actions] [options]
+{% endhighlight %}
+
+e.g.
+
+{% highlight bash %}
+$ sinatra-gen mysinatrapp get:/ post:/:id --vendor --init --test=shoulda --views=haml
+{% endhighlight %}
+
+h4. Actions
+
+For even faster app development you specify actions to include in your app when generating.
+
+Actions are written out as
+
+@http_method:path@
+
+And are seperated by spaces. For example:
+
+@get:/ post:/:id put:/update/*@
+  
+Will be added you your app as:
+
+{% highlight ruby %}
+
+get '/' do
+end
+
+post '/:id' do
+end
+
+put '/update/*' do
+end
+
+{% endhighlight %}
+
+It will also generate test stubs in the test framework of your choosing.
+
+h4. Middleware
+
+You can specify middleware to include by passing the filename(s) or class name(s), seperated by commas.
+
+{% highlight bash %}
+$ sinatra-gen myapp --middleware=rack/flash,Rack::Cache
+{% endhighlight %}
+  
+Will place both the 'require' and 'use' statements in your app.
+
+{% highlight ruby %}
+require 'rack/flash'
+require 'rack/cache'
+
+#...
+
+use Rack::Flash
+use Rack::Cache
+{% endhighlight %}
+
+
+h3(#options). Options
+
+(can also be obtained by running sinatra-gen with no arguments):
+
+{% highlight bash %}
+    -v, --version                    Show the sinatra-gen version number and quit.
+    -d, --vendor                     Extract the latest sinatra to vendor/sinatra
+        --tiny                       Only create the minimal files.
+        --init                       Initialize a git repository
+        --heroku                     Create a Heroku app (also runs 'git init').
+ Optionally, specify the path to the heroku bin
+        --cap                        Adds config directory with basic capistrano deploy.rb
+        --scripts                    Install the rubigen scripts (script/generate, script/destroy)
+        --test=test_framework        Specify your testing framework (bacon (default)/rspec/spec/shoulda/test)
+        --views=view_framework       Specify your view framework (haml (default)/erb/builder)
+        --middleware=rack-middleware Specify Rack Middleware to be required and included (comma delimited)
+        --vegas, --bin=[bin_name]    Create an executable bin using Vegas. Pass an optional bin_name
+{% endhighlight %}
+
+The @--tiny@ option will create no directories. Just an app.rb, a Rakefile, and a config.ru (Rackup file)
+
+h3(#dependencies). Dependencies
+
+sinatra-gen requires:
+
+* rubygems >= 1.3.1
+* rubigen = 1.5.2
+* sinatra >= 0.9.4
+* rack-test >= 0.4.1
+
+If you want to use the @--init@ option, you need to have git installed and on your path.
+
+To use the @--heroku@ option you need the heroku gem as well as a "heroku account.":http://www.heroku.com
