@@ -16,6 +16,8 @@ nav:
     link: "#options"
   - name: Installing
     link: "#installing"
+  - name: Building
+    link: "#building"
 ---
 
 h2(project_name). {{ page.github_name }}
@@ -98,3 +100,20 @@ Deb packages are available:
 table{border:5px hidden black}.
 |_. 32bit |_. 64bit |
 |<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.3-1_i386.deb|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.3-1_amd64.deb|
+
+h3(#building). Building
+
+On ubuntu 10.04 64 and 32 bit 
+
+{% highlight bash %}
+
+$ sudo aptitude install dh-make libfuse-dev sun-java6-jdk maven2 ruby rake couchdb curl
+$ git clone git://github.com/narkisr/fuse4j.git
+$ cd fuse4j/maven
+$ mvn clean install 
+$ cd ..
+$ git clone git://github.com/narkisr/couch-fuse.git
+$ cd couch-fuse
+$ rake deb
+
+{% endhighlight %}
