@@ -8,12 +8,14 @@ nav:
     link: "#what"
   - name: Why
     link: "#why"
-  - name: Demo
-    link: "#demo"
   - name: Usage
     link: "#usage"
+  - name: Demo
+    link: "#demo"
   - name: Options
     link: "#options"
+  - name: Installing
+    link: "#installing"
 ---
 
 h2(project_name). {{ page.github_name }}
@@ -80,7 +82,7 @@ Options
   --help        print options
 {% endhighlight %}
 
-h3(#options). Installing
+h3(#installing). Installing
 
 {% highlight bash %}
 
