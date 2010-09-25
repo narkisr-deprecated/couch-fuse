@@ -2,7 +2,7 @@
 layout: couch
 title: couch-fuse
 github_name: couch-fuse
-current_version: 0.3
+current_version: 0.4
 nav:
   - name: What
     link: "#what"
@@ -99,7 +99,7 @@ Deb packages are available:
 
 table{border:5px hidden black}.
 |_. 32bit |_. 64bit |
-|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.3-1_i386.deb|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.3-1_amd64.deb|
+|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_i386.deb|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_amd64.deb|
 
 h3(#building). Building
 
