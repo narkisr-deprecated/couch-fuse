@@ -1,0 +1,2 @@
+* Fix 10.10 install 
+* Delete playground db in common_test only if it does not exist
