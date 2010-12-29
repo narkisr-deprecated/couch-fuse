@@ -90,8 +90,8 @@ h3(#installing). Installing
 
 $ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_amd64.deb
 $ sudo dpkg -i couch-fuse_0.4-1_amd64.deb
-# if java and fuse-utils are not installed already
-$ sudo apt -f install
+# if java and fuse-utils are not installed already (make sure to enable partner repo for java)
+$ sudo apt-get -f install
 
 {% endhighlight %}
 
