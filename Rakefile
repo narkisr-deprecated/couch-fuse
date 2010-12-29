@@ -23,7 +23,7 @@ end
 
 desc "maven clean install with ld path"
 task :mvnci => :logfile  do
-	mvn_with_ld 'clean install -o'
+	mvn_with_ld 'clean install'
 end
 
 desc "maven compile and test with ld path"
@@ -82,7 +82,7 @@ end
 desc "builds the deb package"
 task :deb => [:clean, :sandbox] do 
 	['control','rules','dirs','postinst','prerm'].each{|f| cp "../../packaging/debian/#{f}",'debian/' } 
-	sh 'sudo dpkg-buildpackage'
+	sh 'sudo dpkg-buildpackage -b -uc -us'
 end
 
 desc "build the deb sandbox folder"

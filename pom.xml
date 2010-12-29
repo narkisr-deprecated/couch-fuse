@@ -4,7 +4,7 @@
     <groupId>com.narkisr</groupId>
     <artifactId>couch-fuse</artifactId>
     <packaging>jar</packaging>
-    <version>0.4</version>
+    <version>0.4.1</version>
     <name>couch-fuse</name>
     <url>http://maven.apache.org</url>
     <dependencies>
@@ -97,7 +97,15 @@
             <plugin>
                 <groupId>com.theoryinpractise</groupId>
                 <artifactId>clojure-maven-plugin</artifactId>
-                <version>1.3.6</version>
+                <version>1.3.5</version>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>src/main/clojure</sourceDirectory>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <testSourceDirectory>src/test/clojure</testSourceDirectory>
+                    </testSourceDirectories>
+                </configuration>
                 <executions>
                     <execution>
                         <id>compile-clojure</id>
@@ -114,9 +122,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <script>startup.clj</script>
-                </configuration>
             </plugin>
         </plugins>
     </build>
