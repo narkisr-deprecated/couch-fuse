@@ -88,8 +88,8 @@ h3(#installing). Installing
 
 {% highlight bash %}
 
-$ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_amd64.deb
-$ sudo dpkg -i couch-fuse_0.4-1_amd64.deb
+$ wget http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4.1-1_amd64.deb
+$ sudo dpkg -i couch-fuse_0.4.1-1_amd64.deb
 # if java and fuse-utils are not installed already (make sure to enable partner repo for java)
 $ sudo apt-get -f install
 
@@ -98,12 +98,12 @@ $ sudo apt-get -f install
 Deb packages are available:
 
 table{border:5px hidden black}.
-|_. 32bit |_. 64bit |
-|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_i386.deb|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4-1_amd64.deb|
+|_. 10.10-32bit |_. 10.10-64bit |
+|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4.1-1_i386.deb|<. "!{width:50px;height:50px}images/deb.png!":http://github.com/downloads/narkisr/couch-fuse/couch-fuse_0.4.1-1_amd64.deb|
 
 h3(#building). Building
 
-On ubuntu 10.04 64 and 32 bit 
+On ubuntu 10.10 64 and 32 bit 
 
 {% highlight bash %}
 
