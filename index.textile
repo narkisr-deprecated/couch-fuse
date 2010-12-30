@@ -2,7 +2,7 @@
 layout: couch
 title: couch-fuse
 github_name: couch-fuse
-current_version: 0.4
+current_version: 0.4.1
 nav:
   - name: What
     link: "#what"
