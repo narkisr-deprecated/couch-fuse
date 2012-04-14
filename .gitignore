@@ -13,3 +13,4 @@ native
 nohup.out
 pkg
 *.jar
+.vagrant
