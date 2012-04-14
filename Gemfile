@@ -5,5 +5,6 @@ gem "vagrant"
 gem "puppet-module"
 gem "puppet"
 gem "puppet-lint"
+gem "rake"
 
 # gem "rails"
