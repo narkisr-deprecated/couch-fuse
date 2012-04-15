@@ -7,9 +7,8 @@ Vagrant::Config.run do |config|
 
   config.vm.network :bridged
 
-  config.vm.provision :puppet 
 
   config.vm.forward_port 5984, 5983
 
-  config.vm.provision :puppet, :module_path => "modules"
+  config.vm.provision :puppet, :module_path => "modules", :options => ["--modulepath", "/tmp/vagrant-puppet/modules-0/"]
 end
