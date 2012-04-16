@@ -10,5 +10,5 @@ Vagrant::Config.run do |config|
 
   config.vm.forward_port 5984, 5983
 
-  config.vm.provision :puppet, :module_path => "modules", :options => ["--modulepath", "/tmp/vagrant-puppet/modules-0/"]
+  config.vm.provision :puppet, :module_path => "modules" 
 end

@@ -7,7 +7,7 @@
     (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete database-delete]))
     (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) (duck-streams :only [to-byte-array]))))
 
-(def *host* "http://127.0.0.1:5984/")
+(def *host* "http://127.0.0.1:5983/")
 (def *db* "playground")
 
 (defn couch [fn & params]
