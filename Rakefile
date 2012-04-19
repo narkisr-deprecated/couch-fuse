@@ -20,6 +20,16 @@ def mvn_with_ld(goal)
 	sh "mvn #{goal}"
 end
 
+def lein_with_ld(goal)
+	ENV["LD_LIBRARY_PATH"]="/usr/lib:#{ENV['JAVA_HOME']}/jre/lib/#{server_path}/server:#{pwd}/../fuse4j/native"
+    sh "lein #{goal}"
+
+end
+
+desc "maven clean install with ld path"
+task :lein_test => :logfile  do
+	lein_with_ld 'test'
+end
 
 desc "maven clean install with ld path"
 task :mvnci => :logfile  do
