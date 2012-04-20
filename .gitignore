@@ -14,3 +14,6 @@ nohup.out
 pkg
 *.jar
 .vagrant
+.lein-deps-sum
+.lein-failures
+classes
