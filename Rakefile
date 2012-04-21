@@ -67,7 +67,7 @@ Rake::PackageTask.new(name, version) do |pack|
 end
 
 task :clean  do
-  ([DEB] + %w(pkg native couchfuse)).each {|f| rm_r f if File.exists? f}
+  ([DEB] + %w(pkg native couchfuse log4j.properties)).each {|f| rm_r f if File.exists? f}
   sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
   sh 'lein clean'
 end
