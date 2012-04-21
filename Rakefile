@@ -6,9 +6,9 @@ require 'erb'
 name = 'couch-fuse'
 version =  '0.4.1'
 
-name_ver = "#{name}-#{version}"
-jar = "#{name_ver}-standalone.jar"
-tar = "../#{name_ver}.tar.gz"
+NAME_VER = "#{name}-#{version}"
+JAR = "#{NAME_VER}-standalone.jar"
+DEB = "couchfuse_#{version}_amd64.deb"
 
 def server_path 
   (`uname -a`.include?("i686") && "i386") || "amd64"
@@ -32,15 +32,17 @@ task :logfile do
   sh 'sudo chmod 666 /var/log/couchfuse.log'
 end
 
-desc 'create jar using lein'
-file jar => [:logfile] do
+desc 'create JAR using lein'
+file JAR => [:logfile] do
   mkdir 'fake' unless File.exists? 'fake'
-  lein_with_ld('uberjar') unless File.exists? jar
+  lein_with_ld('uberjar') unless File.exists? JAR
 end 
 
 file 'couchfuse' do
-  path = "/usr/lib/jvm/java-6-sun/jre/lib/#{server_path}/server"
-  launch = "java -Dlog4j.configuration='file:/usr/share/couchfuse/log4j.properties' -Djava.library.path=/usr/lib:#{path}:/usr/share/couchfuse/native -jar /usr/share/couchfuse/#{jar} '#{name_ver} filesystem' $@"
+  java_path = "/usr/lib/jvm/java-6-sun/jre/lib/#{server_path}/server"
+  parent = '/usr/share/couchfuse'
+  native_path = "#{parent}/native/linux/x86_64"
+  launch = "java -Dlog4j.configuration='file:#{parent}/log4j.properties' -Djava.library.path=/usr/lib:#{java_path}:#{native_path} -jar #{parent}/#{JAR} '#{NAME_VER} filesystem' $@"
   script = "" 
   File.open('packaging/couchfuse.bin' , 'r') { |f| script = f.read }
   template = ERB.new(script)
@@ -55,32 +57,23 @@ file 'native/linux/x86_64/libjavafs.so' do
  sh 'lein native-deps'
 end
 
+file 'log4j.properties' do
+  cp 'src/resources/log4j.properties', 'log4j.properties'
+end
+
 Rake::PackageTask.new(name, version) do |pack|
   pack.need_tar_gz = true
-  pack.package_files.include('native/linux/x86_64/javafs','native/linux/x86_64/libjavafs.so',jar,'couchfuse')
+  pack.package_files.include('native/linux/x86_64/javafs','native/linux/x86_64/libjavafs.so',JAR,'couchfuse','log4j.properties')
 end
 
 task :clean  do
-  %w(pkg native couchfuse).each {|f| rm_r f if File.exists? f}
+  ([DEB] + %w(pkg native couchfuse)).each {|f| rm_r f if File.exists? f}
   sh 'sudo rm -r sandbox' if File.exists? 'sandbox'
   sh 'lein clean'
 end
 
 desc 'builds the deb package'
-task :deb => [:clean, :sandbox] do 
-  ['control','rules','dirs','postinst','prerm'].each{|f| cp "../../packaging/debian/#{f}",'debian/' } 
-  sh 'sudo dpkg-buildpackage -b -uc -us'
+task :deb => [:clean, :package] do 
+  sh "fpm -s dir -t deb -n couchfuse -v #{version} --prefix /usr/share/couchfuse -d 'sun-java6-jre (>= 6-15-1)' -d 'fuse-utils' --post-install packaging/post_install.sh --post-uninstall  packaging/post_uninstall.sh -C pkg/#{NAME_VER} . "
 end
 
-desc 'build the deb sandbox folder'
-task :sandbox => [:package] do
-  mkdir('sandbox') unless File.exists?('sandbox')
-  cp "pkg/#{tar}" , 'sandbox'
-  cd 'sandbox'
-  sh "tar -xvzf #{tar}"
-  mv tar , name_ver
-  cd name_ver
-  sh "echo 'skip confirmation' | dh_make -e narkisr.dev@gmail.com -c apache -f #{tar} -s -p #{name}_#{version}"
-  rm "../#{name}_#{version}.orig.tar.gz"
-  Dir['debian/*.ex'].each {|fn| rm fn rescue nil}
-end

@@ -17,3 +17,4 @@ pkg
 .lein-deps-sum
 .lein-failures
 classes
+*.deb
