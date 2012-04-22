@@ -21,9 +21,9 @@
    ]
 
   :exclusions [ javax.mail/mail javax.jms/jms com.sun.jdmk/jmxtools com.sun.jmx/jmxri ] 
-  :jvm-opts [~(str "-Djava.library.path=native/:" (System/getenv "LD_LIBRARY_PATH"))]
+  :jvm-opts [~(str "-Djava.library.path=native/:" (System/getenv "LD_LIBRARY_PATH"))]; http://tinyurl.com/7h6vr6s  
   :main  com.narkisr.couchfs.mounter
   :aot [com.narkisr.couchfs.mounter]
-  :disable-deps-clean true
+  :disable-deps-clean true ; preventing native cleanup during uberjar
 )
 
