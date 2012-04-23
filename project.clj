@@ -2,17 +2,17 @@
   :description "couchdb fuse file system"
   :dependencies [
           [org.mockito/mockito-all "1.8.1"]      
-          [org.clojure/clojure "1.2.0"]
-          [org.clojure/clojure-contrib "1.2.0"]
+          [org.clojure/clojure "1.3.0"]
+          [org.clojure/core.match "0.2.0-alpha9"]
           [commons-io/commons-io "1.4"]
           [fuse4j/fuse4j-core "2.4.0.0-SNAPSHOT"]
-          [org.clojars.narkisr/clojure-couchdb "0.2.3"]
-          [pattern-match/pattern-match "1.0.0"] ]
+          [clj-http "0.4.0"]
+          [org.clojars.pieterbreed/clojure-couchdb  "0.4.7"]]
 
    :dev-dependencies [
          [circumspec/circumspec "0.0.13"]        
          [commons-logging/commons-logging "1.1.1"]        
-         [log4j/log4j "1.2.15"]        
+         [log4j/log4j "1.2.15"]         
          [native-deps "1.0.5"]
     ]
    

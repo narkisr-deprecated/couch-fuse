@@ -1,7 +1,7 @@
 (ns com.narkisr.couchfs.couch-access
   (:import (java.net URL))
   (:refer-clojure :exclude [contains?])
-  (:require [clojure-http.resourcefully :as resourcefully])
+  (:require [clj-http.client :as client])
   (:use
     (com.narkisr fs-logic)
     (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete database-delete]))
@@ -32,7 +32,7 @@
 
 (defn couch-size [path]
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."
-  (fn [] (-> (str *host* *db* "/" path) resourcefully/head (get-in [:headers :content-length]) first Integer/parseInt (- 1))))
+  (fn [] (-> (str *host* *db* "/" path) client/head (get-in [:headers :content-length]) first Integer/parseInt (- 1))))
 
 (defn update-document [id contents]
   (couch document-update id contents))
@@ -47,13 +47,13 @@
   (couch document-get id))
 
 (defn couch-content [name]
-  (fn [] (-> (str *host* *db* "/" name) resourcefully/get :body-seq first (. getBytes))))
+  (fn [] (-> (str *host* *db* "/" name) client/get :body-seq first (. getBytes))))
 
 (defn couch-attachment-content [doc attachment]
   (fn [] (-> (URL. (couch str "/" doc "/" attachment)) (. openConnection) (. getInputStream) to-byte-array)))
 
 (defn db-exists? [host db]
-  (try (resourcefully/get (str host db))
+  (try (client/get (str host db))
     (catch java.io.IOException e nil)))
 
 (defn create-non-existing-db [name]

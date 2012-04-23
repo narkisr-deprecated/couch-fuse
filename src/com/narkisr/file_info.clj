@@ -1,7 +1,10 @@
 (ns com.narkisr.file-info
   (:refer-clojure :exclude [partition])
-  (:use (clojure.contrib (str-utils2 :only [partition])) pattern-match)
-  (:import java.io.File))
+  (:use 
+    [clojure.core.match :only [match]]
+    )
+  (:import java.io.File)
+  )
 
 (defn fname [path] (-> path (File.) (.getName)))
 
@@ -20,6 +23,20 @@
     (if (= parent "/") 
       (str "/" name)
       (str  parent "/" name  ))))
+
+(defn partition
+  "See http://tinyurl.com/cv5sfr4" 
+  [s re]
+  (let [m (re-matcher re s)]
+    ((fn step [prevend]
+       (lazy-seq
+        (if (.find m)
+          (cons (.subSequence s prevend (.start m))
+                (cons (re-groups m)
+                      (step (+ (.start m) (count (.group m))))))
+          (when (< prevend (.length s))
+            (list (.subSequence s prevend (.length s)))))))
+     0)))
 
 (defn split-path [path] (rest (partition path #"/")))
 
