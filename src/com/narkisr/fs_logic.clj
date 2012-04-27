@@ -1,13 +1,14 @@
 (ns com.narkisr.fs-logic
   (:import java.io.File)
-  (:use (clojure.contrib (def :only [defmacro-])) 
-        (com.narkisr (file-info :only [split-path]))
-         pattern-match))
+  (:use 
+    (com.narkisr (file-info :only [split-path]))
+    [clojure.core.match :only [match]]
+    ))
 
 (defn with-type [type x]
   (with-meta x {:type type}))
 
-(defmacro- def-fstype [name & keys]
+(defmacro def-fstype [name & keys]
   `(defstruct ~name :name :mode :xattrs ~@keys :lastmod))
 
 (def-fstype directory :files)

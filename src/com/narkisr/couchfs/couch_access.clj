@@ -1,11 +1,15 @@
 (ns com.narkisr.couchfs.couch-access
-  (:import (java.net URL))
   (:refer-clojure :exclude [contains?])
   (:require [clj-http.client :as client])
   (:use
     (com.narkisr fs-logic)
-    (couchdb (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete database-delete]))
-    (clojure.contrib (str-utils2 :only [contains?]) error-kit (def :only [defn-memo]) (duck-streams :only [to-byte-array]))))
+    [clojure.java.io :only [copy]]
+    (couchdb 
+      (client :only [database-create document-list document-get document-update document-delete document-create view-get attachment-get attachment-list attachment-create attachment-delete database-delete]))
+    )
+  (:import 
+    (java.io ByteArrayOutputStream InputStream)
+    (java.net URL)))
 
 (def *host* "http://127.0.0.1:5983/")
 (def *db* "playground")
@@ -15,7 +19,7 @@
   (apply fn *host* *db* params))
 
 (defn- not-design-id [id]
-  (not (contains? id "design")))
+  (not (.contains id "design")))
 
 (defn all-ids []
   (lazy-seq (filter not-design-id (couch document-list))))
@@ -48,6 +52,11 @@
 
 (defn couch-content [name]
   (fn [] (-> (str *host* *db* "/" name) client/get :body-seq first (. getBytes))))
+
+(defn to-byte-array [#^InputStream x]
+  (let [buffer (ByteArrayOutputStream.)]
+    (copy x buffer)
+    (.toByteArray buffer)))
 
 (defn couch-attachment-content [doc attachment]
   (fn [] (-> (URL. (couch str "/" doc "/" attachment)) (. openConnection) (. getInputStream) to-byte-array)))

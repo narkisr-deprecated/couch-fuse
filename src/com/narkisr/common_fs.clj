@@ -1,6 +1,5 @@
 (ns com.narkisr.common-fs
-  (:import org.apache.commons.logging.LogFactory)
-  (:use (clojure.contrib (seq-utils :only [find-first]) (pprint))))
+  (:import org.apache.commons.logging.LogFactory))
 
 (defn log-info [this text]
   (. (LogFactory/getLog (class this)) info text))
@@ -15,7 +14,7 @@
   (map (fn [[k v]] [k v]) pre))
 
 (defn first-error [pre]
-  (find-first (fn [[[cond errno] form]] (not cond)) pre))
+  (first (filter  (fn [[[cond errno] form]] (not cond)) pre)))
 
 (defmacro def-fs-fn
   ([name args] `(def-fs-fn ~name ~args {} (identity 0)))

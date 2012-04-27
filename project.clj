@@ -7,7 +7,9 @@
           [commons-io/commons-io "1.4"]
           [fuse4j/fuse4j-core "2.4.0.0-SNAPSHOT"]
           [clj-http "0.4.0"]
-          [org.clojars.pieterbreed/clojure-couchdb  "0.4.7"]]
+          [com.narkisr/clojure-couchdb  "0.5.0"]
+          [slingshot "0.10.2"]    
+          [cheshire "4.0.0"]]
 
    :dev-dependencies [
          [circumspec/circumspec "0.0.13"]        

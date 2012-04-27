@@ -1,7 +1,7 @@
 (ns com.narkisr.protocols 
   (:import fuse.FuseFtypeConstants)
-  (:use (clojure.contrib (def :only [defmacro-])) 
-        (com.narkisr common-fs file-info))
+  (:use 
+    (com.narkisr common-fs file-info))
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]))
@@ -14,7 +14,7 @@
 (defn into-syms [keys]
   (vec (map #(. % sym) (into [:name :mode :xattrs :lastmod] keys))))
 
-(defmacro- fstype [name & keys]
+(defmacro fstype [name & keys]
   `(defrecord ~name ~(into-syms keys)))
 
 (fstype Root :files)
