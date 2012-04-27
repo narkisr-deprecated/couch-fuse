@@ -2,14 +2,17 @@
   (:require [com.narkisr.protocols :as proto])
   (:import java.io.File)
   (:use
-    (com.narkisr.couchfs  (couch-access :only [update-document get-document]))
-    (com.narkisr fs-logic common-test)
-    (clojure.contrib shell-out test-is str-utils (duck-streams :only [slurp*]) (json :only [read-json json-str]))))
+    [clojure.test :only [use-fixtures deftest is do-template]]
+    [cheshire.core :only [parse-string generate-string]]
+    [clojure.java.shell :only [sh]]
+    (com.narkisr.couchfs  
+      (couch-access :only [update-document get-document]))
+    (com.narkisr fs-logic common-test)))
 
 ; these tests actually mount a live couchdb therefor they require one up
 (use-fixtures :once mount-and-sleep)
 
-(defn slurp-json [] (-> meta-file (File.) slurp* read-json))
+(defn slurp-json [] (-> meta-file slurp (parse-string true)))
 
 (deftest empty-ls
   (is (= (sh "ls" "fake") (str uuid "\n"))))
@@ -21,9 +24,9 @@
 
 (deftest in-place-edit
   "Note that using :key won't work when assoc or dissoc since couch is saving it as a string."
-    (spit (File. meta-file) (json-str (assoc (slurp-json) :key "value")))
+    (spit (File. meta-file) (generate-string (assoc (slurp-json) :key "value")))
     (is (= ((slurp-json) :key) "value"))
-    (spit (File. meta-file) (json-str (dissoc (slurp-json) :key "value")))
+    (spit (File. meta-file) (generate-string (dissoc (slurp-json) :key "value")))
     (is (= (contains? (slurp-json) :key) false))
     (is (= ((slurp-json) :_rev) ((get-document uuid) :_rev))))
 

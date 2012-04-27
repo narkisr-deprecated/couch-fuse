@@ -1,5 +1,7 @@
 (ns com.narkisr.fs-logic-test
-  (:use clojure.contrib.test-is com.narkisr.fs-logic)
+  (:use 
+    (clojure (test :only [use-fixtures deftest is]))
+    com.narkisr.fs-logic)
   (:import com.narkisr.protocols.Directory 
            com.narkisr.protocols.Root
            com.narkisr.protocols.MetaFolder
@@ -8,7 +10,7 @@
 (defn init [f]
   (let [content "some nice content"]
     (dosync (ref-set root (Root. "" 0755 [:description "Root directory"] 0
-      {"README" (File. "README" 0644 [:description "A Readme File" :mimetype "text/plain"] 0 (. content getBytes) (. content length) )})))
+                                 {"README" (File. "README" 0644 [:description "A Readme File" :mimetype "text/plain"] 0 (. content getBytes) (. content length) )})))
     (f)))
 
 (use-fixtures :once init)

@@ -3,8 +3,10 @@
   (:import java.io.File)
   (:use
     (com.narkisr.couchfs (mounter :only [mount-with-group]))
+    (clojure.java (shell :only [sh]))
     (com.narkisr fs-logic )
-    (clojure.contrib shell-out )))
+    ))
+
 
 (def meta-file)
 (def uuid)

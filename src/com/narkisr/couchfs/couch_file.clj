@@ -8,7 +8,7 @@
             )
   (:use 
     [slingshot.slingshot :only [try+]]
-    [cheshire.core :only [parse-string ]]
+    [cheshire.core :only [parse-string]]
     (com.narkisr common-fs file-info)
     )
   (:import (couchdb.errors ResourceConflict) ) 
@@ -19,9 +19,9 @@
     (try+
       (if attachment 
         (file-update/update-attachment path couch-id (:name file) contents-str)
-        (file-update/update-rev-and-time path (couch/update-document couch-id (parse-string contents-str))))
+        (file-update/update-rev-and-time path (couch/update-document couch-id (parse-string contents-str true))))
       (catch ResourceConflict e
-        (file-update/use-lastest-rev path couch-id (parse-string contents-str))))))
+        (file-update/use-lastest-rev path couch-id (parse-string contents-str true))))))
 
 (defn fetch-content
   ([file] (-> file :content (apply [])))
