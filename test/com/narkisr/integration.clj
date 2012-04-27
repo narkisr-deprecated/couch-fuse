@@ -2,11 +2,11 @@
   (:require [com.narkisr.protocols :as proto])
   (:import java.io.File)
   (:use
-    [clojure.test :only [use-fixtures deftest is do-template]]
+    [clojure.test :only [use-fixtures deftest is are]]
     [cheshire.core :only [parse-string generate-string]]
     [clojure.java.shell :only [sh]]
     (com.narkisr.couchfs  
-      (couch-access :only [update-document get-document]))
+      [couch-access :only [update-document get-document]])
     (com.narkisr fs-logic common-test)))
 
 ; these tests actually mount a live couchdb therefor they require one up
@@ -44,7 +44,7 @@
   (is (= (sh "rm" "-r" "fake/.foo") "")))
 
 (deftest mkdir-only-on-root
-  (do-template 
+  (are [_1 _2 _3 _4]
     (do
      (is (= (-> _1 (File.) (.mkdir)) _2))
      (is (= (sh "rm" "-r" _1) _3))
@@ -54,7 +54,7 @@
     ))
 
 (deftest non-legal-json-with-recovery
-    (spit meta-file (json-str (assoc (slurp-json) :key "value")))
+    (spit meta-file (generate-string (assoc (slurp-json) :key "value")))
     (spit meta-file "blabla") ; non legal json
     (is (= ((slurp-json) :_rev) ((get-document uuid) :_rev)))
     (is (= ((slurp-json) :key) "value")))
@@ -62,6 +62,6 @@
 (deftest update-conflict
   "In this test we update a document value behind the scenes, still the fs value wins out in the conflict"
     (update-document uuid (assoc (slurp-json) :key "value1"))
-    (spit meta-file (json-str (assoc (slurp-json) :key "value2")))
+    (spit meta-file (generate-string (assoc (slurp-json) :key "value2")))
     (is (= ((slurp-json) :key) "value2")))
 
