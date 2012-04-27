@@ -1,0 +1,3 @@
+[submodule "couchdb-sandbox"]
+	path = couchdb-sandbox
+	url = git://github.com/narkisr/couchdb-sandbox.git
