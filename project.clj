@@ -16,6 +16,7 @@
          [commons-logging/commons-logging "1.1.1"]        
          [log4j/log4j "1.2.15"]         
          [native-deps "1.0.5"]
+         [org.clojure/tools.trace "0.7.3"]
     ]
    
   :native-dependencies [
