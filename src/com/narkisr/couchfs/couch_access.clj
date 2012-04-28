@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [contains?])
   (:require [clj-http.client :as client])
   (:use
+    [slingshot.slingshot :only [try+]]
     (com.narkisr fs-logic)
     [clojure.java.io :only [copy]]
     (couchdb 
@@ -11,8 +12,8 @@
     (java.io ByteArrayOutputStream InputStream)
     (java.net URL)))
 
-(def *host* "http://127.0.0.1:5983/")
-(def *db* "playground")
+(def ^:dynamic *host* "http://127.0.0.1:5983/")
+(def ^:dynamic *db* "playground")
 
 (defn couch [fn & params]
   "Applies the binded couch configuration on the given fn, this cannot be a macro since the values are binded post the expansion stage"
@@ -62,8 +63,8 @@
   (fn [] (-> (URL. (couch str "/" doc "/" attachment)) (. openConnection) (. getInputStream) to-byte-array)))
 
 (defn db-exists? [host db]
-  (try (client/get (str host db))
-    (catch java.io.IOException e nil)))
+  (try+ (client/get (str host db))
+    (catch identity e nil)))
 
 (defn create-non-existing-db [name]
   (when-not (db-exists? *host* name)
