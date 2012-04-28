@@ -31,11 +31,11 @@
   (assoc-in data (butlast keys) (dissoc (get-in data (butlast keys)) (last keys)))) 
 
 (defn- path-match-to-keys [path]
-  (match path
-    ["/" dir "/" file] (list :files dir :files file)
-    ["/" dir "/" & rest] (concat (list :files dir :files) (path-match-to-keys rest))
-    [dir "/" & rest] (concat (list dir :files) (path-match-to-keys rest))
-    ["/" file] (list :files file)))
+  (match [path]
+    [(["/" dir "/" file] :seq)] (list :files dir :files file)
+    [(["/" dir "/" & rest] :seq)] (concat (list :files dir :files) (path-match-to-keys rest))
+    [([dir "/" & rest] :seq) ] (concat (list dir :files) (path-match-to-keys rest))
+    [(["/" file] :seq)] (list :files file)))
 
 (defn lookup-keys [path]
   (path-match-to-keys (split-path path)))
