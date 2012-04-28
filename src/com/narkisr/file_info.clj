@@ -41,10 +41,10 @@
 (defn split-path [path] (rest (partition path #"/")))
 
 (defn to-hidden [path]
-  (match (split-path path)
-         ["/" dir] (str "/." dir)
-         ["/" dir "/" file] (str "/." dir "/" file)
-         _ (str (hidden (parent-path path)) "/" (fname path))))
+  (match [(split-path path)] 
+         [(["/" dir] :seq)] (str "/." dir)
+         [(["/" dir "/" file] :seq)] (str "/." dir "/" file)
+         :else (str (hidden (parent-path path)) "/" (fname path))))
 
 (defn combine [parent child]
   (if (= parent "/") 
