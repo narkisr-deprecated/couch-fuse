@@ -37,7 +37,10 @@
 
 (defn couch-size [path]
   "Fetches file size in bytes using http HEAD, note that size is + 1 more than the actual content size."
-  (fn [] (-> (str *host* *db* "/" path) client/head (get-in [:headers :content-length]) first Integer/parseInt (- 1))))
+  (fn [] 
+    (let [u (str *host* *db* "/" path) h (client/head u)] 
+      (-> h (get-in [:headers "content-length"]) Integer/parseInt (- 1)))))
+
 
 (defn update-document [id contents]
   (couch document-update id contents))
@@ -52,7 +55,8 @@
   (couch document-get id))
 
 (defn couch-content [name]
-  (fn [] (-> (str *host* *db* "/" name) client/get :body-seq first (. getBytes))))
+  (fn [] 
+    (-> (str *host* *db* "/" name) client/get :body (. getBytes))))
 
 (defn to-byte-array [#^InputStream x]
   (let [buffer (ByteArrayOutputStream.)]
