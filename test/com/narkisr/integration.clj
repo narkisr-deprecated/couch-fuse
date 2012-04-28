@@ -15,7 +15,8 @@
 (defn slurp-json [] (-> meta-file slurp (parse-string true)))
 
 (deftest empty-ls
-  (is (= (sh "ls" "fake") (str uuid "\n"))))
+  (assert-sh "ls" "fake" :out (str uuid "\n"))
+  )
 
 (deftest file-creation-should-fail
   (let [temp (File. "fake/bla.txt")]
@@ -36,18 +37,18 @@
   (is (= (-> "fake/.foo/" (File.) (.delete)) false))
   (is (= (-> "fake/foo/" (File.) (.delete)) true))
   (is (= (-> "fake/.foo/" (File.) (.delete)) true))
-  (is (= (sh "ls" "fake") (str uuid "\n"))))
+  (is (= (assert-sh "ls" "fake" :out (str uuid "\n")))))
 
 (deftest folder-deletion-bash
-  (is (= (sh "mkdir" "fake/foo") ""))
-  (is (= (sh "rm" "-r" "fake/foo") ""))
-  (is (= (sh "rm" "-r" "fake/.foo") "")))
+  (assert-sh "mkdir" "fake/foo" :out "") 
+  (assert-sh "rm" "-r" "fake/foo" :out "")
+  (assert-sh "rm" "-r" "fake/.foo" :out ""))
 
 (deftest mkdir-only-on-root
   (are [_1 _2 _3 _4]
     (do
      (is (= (-> _1 (File.) (.mkdir)) _2))
-     (is (= (sh "rm" "-r" _1) _3))
+     (assert-sh "rm" "-r" _1 :err _3)
      (sh "rm" "-r" _4))
      "fake/bla" true "" "fake/.bla"
      "fake/bla/nested" false "rm: cannot remove `fake/bla/nested': No such file or directory\n" ""
