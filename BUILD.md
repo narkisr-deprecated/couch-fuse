@@ -17,17 +17,31 @@ In order to build it the following perquisite should be meet:
 
 ## Packages and sandbox
 
+fuse4j:
+
+
+```
+ $ sudo aptitude install maven
+ $ git clone git://github.com/narkisr/fuse4j.git
+ $ cd fuse4j/maven/fuse4j-core
+ $ mvn install 
+ $ cd fuse4j/maven/
+ # installing only parent pom
+ $ mvn install -N 
+```
+
 Bundler and gems:
 
 ```bash
+ $ cd couch-fuse
  $ gem install bundle    
  $ bundle install 
 ```
 
-Install Ubuntu 11.10 box and fire the couchdb sandbox machine:
+Install Ubuntu 12.04 box and fire the couchdb sandbox machine:
 
 ```bash
-  $ vagrant box add ubuntu-11.10 http://timhuegdon.com/vagrant-boxes/ubuntu-11.10.box
+  $ vagrant box add ubuntu-12.04 http://files.vagrantup.com/precise64.box
   # This will start a VM with a couchdb instance port forwarded to port 5983
   $ vagrant up
 ```
@@ -37,6 +51,7 @@ Install Ubuntu 11.10 box and fire the couchdb sandbox machine:
 Run tests:
 
 ```bash 
+  $ lein deps
   # Running lein through rake in order for it to set LD_LIBRARY_PATH
   $ rake 'lein[native-deps]'
   $ rake 'lein[compile]'
