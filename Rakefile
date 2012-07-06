@@ -58,7 +58,7 @@ file 'native/linux/x86_64/libjavafs.so' do
 end
 
 file 'log4j.properties' do
-  cp 'src/resources/log4j.properties', 'log4j.properties'
+  cp 'resources/log4j.properties', 'log4j.properties'
 end
 
 Rake::PackageTask.new(name, version) do |pack|
