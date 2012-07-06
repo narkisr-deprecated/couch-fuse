@@ -52,8 +52,8 @@ Run tests:
 
 ```bash 
   $ lein deps
+  $ lein native-deps
   # Running lein through rake in order for it to set LD_LIBRARY_PATH
-  $ rake 'lein[native-deps]'
   $ rake 'lein[compile]'
   $ rake 'lein[test]'
 ```
