@@ -1,4 +1,5 @@
 (ns com.narkisr.couchfs.couch-file
+  (:refer-clojure :exclude [partition])
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]

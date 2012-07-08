@@ -1,7 +1,7 @@
 (ns com.narkisr.protocols 
+  (:refer-clojure :exclude [partition])
   (:import fuse.FuseFtypeConstants)
-  (:use 
-    (com.narkisr common-fs file-info))
+  (:use (com.narkisr common-fs file-info))
   (:require [com.narkisr.couchfs.couch-access :as couch] 
             [com.narkisr.couchfs.file-update :as file-update]
             [com.narkisr.fs-logic :as fs-logic]))

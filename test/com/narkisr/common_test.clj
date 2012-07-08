@@ -33,7 +33,7 @@
   (def file-path (str "fake/" uuid "/" uuid ".html"))
   (couch/create-non-existing-db "playground")
   (sh "mkdir" "fake")
-  (mount-with-group "http://127.0.0.1:5983/" "playground" "fake" "fuse-threads")
+  (mount-with-group "http://localhost:5984/" "playground" "fake" "fuse-threads")
   (java.lang.Thread/sleep 1000)
   (sh "mkdir" (str "fake/" uuid))
   (f)

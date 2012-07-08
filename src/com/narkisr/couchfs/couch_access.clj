@@ -12,7 +12,7 @@
     (java.io ByteArrayOutputStream InputStream)
     (java.net URL)))
 
-(def ^:dynamic *host* "http://127.0.0.1:5983/")
+(def ^:dynamic *host* "http://localhost:5984/")
 (def ^:dynamic *db* "playground")
 
 (defn couch [fn & params]
