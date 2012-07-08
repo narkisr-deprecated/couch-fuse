@@ -1,5 +1,5 @@
 #!/bin/sh
-<%=launch%> -run-valid true 
+<%=launch%> -rv
 exitValue=$? 
 if [ $exitValue != 0 ] 
 then 

@@ -4,6 +4,7 @@
           [org.mockito/mockito-all "1.8.1"]      
           [org.clojure/clojure "1.3.0"]
           [org.clojure/core.match "0.2.0-alpha9"]
+          [org.clojure/tools.cli "0.2.1"]
           [commons-io/commons-io "1.4"]
           [fuse4j/fuse4j-core "2.4.0.0-SNAPSHOT"]
           [clj-http "0.4.0"]

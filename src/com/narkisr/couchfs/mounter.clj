@@ -2,10 +2,12 @@
   (:gen-class)
   (:import fuse.FuseMount org.apache.commons.logging.LogFactory java.io.File)
   (:use 
+    [clojure.core.match :only [match]]
+    (clojure.tools (cli :only [cli]))
     (com.narkisr.couchfs couch-fs couch-access (initialization :only [init-fs-root]))))
 
 (defn valid? [cond message]
-  (if (cond) (do (println message) (System/exit 1))))
+  (when (cond) (do (println message) (System/exit 1))))
 
 (defn validate [host db path]
   (doseq [[cond error] [[#(some empty? [db path]) "db and path are mandatory."]
@@ -29,9 +31,25 @@
   (FuseMount/mount (into-array [path "-f"]) (com.narkisr.couch-fuse.) (java.lang.ThreadGroup. group) (creat-log)))
 
 (defn -main [version & args]
-  #_(with-command-line args version
-      [[run-valid? "runs validation only" false] 
-       [host "Couchdb host name" "http://127.0.0.1:5984/"]
-       [db "Couchdb db name"] 
-       [path "Mount path on local filesystem"] remaining]
-      (if run-valid? (validate host db path) (mount host db path))))
+    (let [[{:keys [database host path] :as options} args banner] 
+          (cli args
+               ["-o" "--host" "Couchdb hostname" :default "http://127.0.0.1:5984/"]
+               ["-h" "--help" "help" :default false :flag true]
+               ["-d" "--database" "Couch db name"]
+               ["-rv" "--run-validate" "Run input validation" :default false :flag true]
+               ["-p" "--path" "Mount path on local filesystem" :default ""]
+               ["-v" "--version" "Print version" :default false :flag true])]
+      (cond
+        (options :version) (println version)
+        (options :help) (println banner)
+        (options :run-validate) (validate host database path)
+        :else  
+        (do 
+          (validate host database path)
+          (mount host database path)
+          )))
+  )
+
+;(-main "123" "-h" "-rv" )
+;(-main "123" "-v" "-rv" )
+;(-main "123" "-d" "foo" "-p" "/home/ronen/temp")
