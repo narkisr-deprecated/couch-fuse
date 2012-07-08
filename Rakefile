@@ -4,7 +4,7 @@ require 'erb'
 
 
 name = 'couch-fuse'
-version =  '0.4.1'
+version =  '0.5.0'
 
 NAME_VER = "#{name}-#{version}"
 JAR = "#{NAME_VER}-standalone.jar"

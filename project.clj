@@ -1,4 +1,4 @@
-(defproject couch-fuse "0.4.1"
+(defproject couch-fuse "0.5.0"
   :description "couchdb fuse file system"
   :dependencies [
           [org.mockito/mockito-all "1.8.1"]      
